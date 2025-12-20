@@ -1,8 +1,10 @@
 package com.example.fintar.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -24,10 +26,19 @@ public class User {
     private String email;
 
     @Column(nullable = false)
+    @JsonIgnore
     private String password;
 
     @Column(nullable = false)
     private Boolean isActive;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles;
 
     /*
       id uuid pk DONE

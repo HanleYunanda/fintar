@@ -1,15 +1,16 @@
 package com.example.fintar.service;
 
 import com.example.fintar.dto.UserRequest;
+import com.example.fintar.entity.Role;
 import com.example.fintar.entity.User;
 import com.example.fintar.exception.ResourceNotFoundException;
+import com.example.fintar.repository.RoleRepository;
 import com.example.fintar.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -17,16 +18,29 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private RoleService roleService;
+
     public List<User> getAllUser() {
         return userRepository.findAll();
     }
 
     public User createUser(UserRequest req) {
+        // Jika roles di request kosong kasih default role CUSTOMER
+        if(req.getRoles().isEmpty()) {
+            req.setRoles(Set.of("CUSTOMER"));
+        }
+
+        // Ambil roles dari DB
+        Set<Role> roles = roleService.getRolesByName(req.getRoles());
+        if(roles.isEmpty()) throw new ResourceNotFoundException("Create base roles first");
+
         User user = User.builder()
                 .username(req.getUsername())
                 .email(req.getEmail())
                 .password(req.getPassword())
                 .isActive(true)
+                .roles(roles)
                 .build();
         return userRepository.save(user);
     }

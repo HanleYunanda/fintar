@@ -18,15 +18,19 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     protected ResponseEntity<ApiResponse<Object>> handleMethodArgumentNotValid (MethodArgumentNotValidException ex) {
         BindingResult bindingResult = ex.getBindingResult();
-        Map<String, String> errors = new HashMap<>();
-        bindingResult.getFieldErrors().forEach(fieldError -> {
-            errors.put(fieldError.getField(), fieldError.getDefaultMessage());
-        });
-        return ResponseUtil.errorWithData(HttpStatus.BAD_REQUEST, "Invalid request content", errors);
+        if(bindingResult.hasErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(fieldError -> {
+                errors.put(fieldError.getField(), fieldError.getDefaultMessage());
+            });
+            return ResponseUtil.errorWithData(HttpStatus.BAD_REQUEST, "Invalid request content", errors);
+        } else {
+            return ResponseUtil.error(HttpStatus.BAD_REQUEST, ex.getMessage());
+        }
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiResponse<Object>> handleResourceNotFoundException(ResourceNotFoundException err) {
-        return ResponseUtil.error(HttpStatus.BAD_REQUEST, err.getMessage());
+    public ResponseEntity<ApiResponse<Object>> handleResourceNotFoundException(ResourceNotFoundException ex) {
+        return ResponseUtil.error(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 }
