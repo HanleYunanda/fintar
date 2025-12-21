@@ -5,7 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -31,6 +34,20 @@ public class Plafond {
 
     @Column(columnDefinition = "NVARCHAR(MAX)", nullable = false)
     private String productSelection; // JSON string
+
+    @Column(nullable = false)
+    private UUID createdBy;
+
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private Instant createdAt;
+
+    @Column(nullable = false)
+    private UUID updatedBy;
+
+    @UpdateTimestamp
+    @Column(nullable = false)
+    private Instant updatedAt;
 
     /*
         Data Inside productSelection

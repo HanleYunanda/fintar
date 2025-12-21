@@ -33,4 +33,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Object>> handleResourceNotFoundException(ResourceNotFoundException ex) {
         return ResponseUtil.error(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
+
+    @ExceptionHandler(InvalidJwtException.class)
+    public ResponseEntity<ApiResponse<Object>> handleInvalidJwtException(InvalidJwtException ex) {
+        return ResponseUtil.error(HttpStatus.UNAUTHORIZED, ex.getMessage());
+    }
 }

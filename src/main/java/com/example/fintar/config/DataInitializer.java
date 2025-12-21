@@ -7,6 +7,7 @@ import com.example.fintar.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -16,6 +17,7 @@ import java.util.Set;
 public class DataInitializer implements CommandLineRunner {
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
     public void run(String... args) throws Exception {
@@ -35,7 +37,7 @@ public class DataInitializer implements CommandLineRunner {
                 User user1 = User.builder()
                         .username("ADMIN USER")
                         .email("admin@gmail.com")
-                        .password("Admin123!")
+                        .password(bCryptPasswordEncoder.encode("Admin123!"))
                         .isActive(true)
                         .roles(Set.of(admin))
                         .build();
