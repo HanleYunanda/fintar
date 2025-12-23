@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -17,7 +18,7 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Plafond {
+public class Plafond implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -35,19 +36,19 @@ public class Plafond {
     @Column(columnDefinition = "NVARCHAR(MAX)", nullable = false)
     private String productSelection; // JSON string
 
-    @Column(nullable = false)
-    private UUID createdBy;
-
-    @CreationTimestamp
-    @Column(nullable = false, updatable = false)
-    private Instant createdAt;
-
-    @Column(nullable = false)
-    private UUID updatedBy;
-
-    @UpdateTimestamp
-    @Column(nullable = false)
-    private Instant updatedAt;
+//    @Column(nullable = false)
+//    private UUID createdBy;
+//
+//    @CreationTimestamp
+//    @Column(nullable = false, updatable = false)
+//    private Instant createdAt;
+//
+//    @Column(nullable = false)
+//    private UUID updatedBy;
+//
+//    @UpdateTimestamp
+//    @Column(nullable = false)
+//    private Instant updatedAt;
 
     /*
         Data Inside productSelection

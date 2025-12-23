@@ -2,6 +2,7 @@ package com.example.fintar.filter;
 
 import com.example.fintar.exception.InvalidJwtException;
 import com.example.fintar.service.JwtService;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -45,7 +46,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             final String jwt = authHeader.substring(7);
             final String username = jwtService.extractClaims(jwt).getSubject();
-            System.out.println(jwtService.extractClaims(jwt));
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -63,9 +63,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
             filterChain.doFilter(request, response);
-        } catch (Exception exception) {
-            exception.printStackTrace();
-            handlerExceptionResolver.resolveException(request, response, null, new InvalidJwtException("Invalid JWT token"));
+        } catch (JwtException exception) {
+            handlerExceptionResolver.resolveException(request, response, null, exception);
         }
     }
 }

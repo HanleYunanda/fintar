@@ -3,7 +3,10 @@ package com.example.fintar.service;
 import com.example.fintar.dto.CreateRoleRequest;
 import com.example.fintar.entity.Role;
 import com.example.fintar.repository.RoleRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,10 +18,13 @@ public class RoleService {
     @Autowired
     RoleRepository roleRepository;
 
+    @Cacheable(value = "roles")
     public List<Role> getAllRole() {
         return roleRepository.findAll();
     }
 
+    @Transactional
+    @CacheEvict(value = "roles", allEntries = true)
     public Role createRole(CreateRoleRequest req) {
         Role role = Role.builder()
                 .name(req.getName())

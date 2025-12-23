@@ -7,6 +7,7 @@ import com.example.fintar.service.PlafondService;
 import com.example.fintar.util.ResponseUtil;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +16,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/plafonds")
-@PreAuthorize("hasRole('BACK OFFICE')")
 public class PlafondController {
 
     @Autowired
@@ -24,7 +24,7 @@ public class PlafondController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<Plafond>>> index() {
         List<Plafond> plafonds = plafondService.getAllPlafond();
-        return ResponseUtil.ok(null, "Successfully get all plafonds");
+        return ResponseUtil.ok(plafonds, "Successfully get all plafonds");
     }
 
     @PostMapping
