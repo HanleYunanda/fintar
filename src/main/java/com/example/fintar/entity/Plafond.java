@@ -14,6 +14,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -34,5 +35,8 @@ public class Plafond extends BaseEntity implements Serializable {
 
     @Column(nullable = false)
     private Integer maxTenor;
+
+    @OneToMany(mappedBy = "plafond")
+    private List<Product> products;
 
 }

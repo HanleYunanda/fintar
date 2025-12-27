@@ -36,7 +36,7 @@ public class PlafondController {
             @RequestBody @Valid PlafondRequest req
     ) {
         PlafondResponse createdPlafond = plafondService.createPlafond(req);
-        return ResponseUtil.ok(createdPlafond, "Successfully create new user");
+        return ResponseUtil.ok(createdPlafond, "Successfully create new plafond");
     }
 
     @GetMapping("/{id}")

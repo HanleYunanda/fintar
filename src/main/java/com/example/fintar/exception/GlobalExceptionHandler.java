@@ -96,6 +96,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 //        return ResponseUtil.error(HttpStatus.BAD_REQUEST, ex.getMessage());
 //    }
 
+    @ExceptionHandler(BusinessValidationException.class)
+    public ResponseEntity<ApiResponse<Object>> handleBusinessValidationException(BusinessValidationException ex) {
+        return ResponseUtil.error(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Object>> handleException(Exception ex) {
         return ResponseUtil.error(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error");
