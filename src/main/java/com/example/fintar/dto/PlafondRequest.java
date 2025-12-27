@@ -7,13 +7,11 @@ import lombok.Data;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Data
-public class CreatePlafondRequest {
-
+public class PlafondRequest {
     private String name;
     private Double maxAmount;
     private Integer maxTenor;
-    private Set<String> productRequest; // String with format <tenor;interestRate>
-
 }

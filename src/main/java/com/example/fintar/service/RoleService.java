@@ -1,6 +1,6 @@
 package com.example.fintar.service;
 
-import com.example.fintar.dto.CreateRoleRequest;
+import com.example.fintar.dto.RoleRequest;
 import com.example.fintar.entity.Role;
 import com.example.fintar.repository.RoleRepository;
 import jakarta.transaction.Transactional;
@@ -25,10 +25,9 @@ public class RoleService {
 
     @Transactional
     @CacheEvict(value = "roles", allEntries = true)
-    public Role createRole(CreateRoleRequest req) {
+    public Role createRole(RoleRequest req) {
         Role role = Role.builder()
                 .name(req.getName())
-                .isActive(true)
                 .build();
         return roleRepository.save(role);
     }

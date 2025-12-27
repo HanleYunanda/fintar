@@ -51,7 +51,7 @@ public class UserController {
         return ResponseUtil.ok(user, "Successfully update user");
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<User>> delete(
             @PathVariable UUID id
     ) {

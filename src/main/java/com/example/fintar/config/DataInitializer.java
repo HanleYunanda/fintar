@@ -22,11 +22,11 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         if (roleRepository.count() == 0) {
-            Role customer = Role.builder().name("CUSTOMER").isActive(true).build();
-            Role marketing = Role.builder().name("MARKETING").isActive(true).build();
-            Role bm = Role.builder().name("BRANCH MANAGER").isActive(true).build();
-            Role bo = Role.builder().name("BACK OFFICE").isActive(true).build();
-            Role admin = Role.builder().name("ADMIN").isActive(true).build();
+            Role customer = Role.builder().name("CUSTOMER").build();
+            Role marketing = Role.builder().name("MARKETING").build();
+            Role bm = Role.builder().name("BRANCH_MANAGER").build();
+            Role bo = Role.builder().name("BACK_OFFICE").build();
+            Role admin = Role.builder().name("ADMIN").build();
             roleRepository.save(customer);
             roleRepository.save(marketing);
             roleRepository.save(bm);
@@ -35,12 +35,13 @@ public class DataInitializer implements CommandLineRunner {
 
             if(userRepository.count() == 0) {
                 User user1 = User.builder()
-                        .username("ADMIN USER")
+                        .username("ADMIN_USER")
                         .email("admin@gmail.com")
                         .password(bCryptPasswordEncoder.encode("Admin123!"))
                         .isActive(true)
                         .roles(Set.of(admin))
                         .build();
+
                 userRepository.save(user1);
             }
         }

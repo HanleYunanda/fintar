@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
@@ -17,29 +19,16 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Role implements Serializable {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+@SQLDelete(sql = "UPDATE roles SET is_deleted = 1 WHERE id = ?")
+@SQLRestriction("is_deleted = 0")
+public class Role extends BaseEntity implements Serializable {
 
     @Column(nullable = false, unique = true)
     private String name;
 
-    @Column(nullable = false)
-    private Boolean isActive;
-
     @ManyToMany(mappedBy = "roles")
     @JsonIgnore
     private List<User> users;
-
-    @CreationTimestamp
-    @Column(nullable = false, updatable = false)
-    private Instant createdAt;
-
-    @UpdateTimestamp
-    @Column(nullable = false)
-    private Instant updatedAt;
 
     /*
       id uuid pk DONE
