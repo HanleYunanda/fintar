@@ -41,6 +41,9 @@ public class User extends BaseEntity implements UserDetails {
     )
     private Set<Role> roles;
 
+    @OneToOne(mappedBy = "user")
+    private CustomerDetail customerDetail;
+
     // Implementing UserDetails Method
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

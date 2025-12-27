@@ -24,7 +24,6 @@ public class ProductService {
     private final ProductMapper productMapper;
     private final PlafondService plafondService;
 
-
     public List<ProductResponse> getAllProduct() {
         return productMapper.toResponseList(productRepository.findAll());
     }
