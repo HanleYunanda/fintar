@@ -35,7 +35,7 @@ public class AuthService {
                 .email(req.getEmail())
                 .username(req.getUsername())
                 .password(passwordEncoder.encode(req.getPassword()))
-                .roles(roleService.getRolesByName(Set.of("CUSTOMER")))
+                .roles(roleService.getRolesEntityByName(Set.of("CUSTOMER")))
                 .isActive(true)
                 .build();
         return userRepository.save(user);

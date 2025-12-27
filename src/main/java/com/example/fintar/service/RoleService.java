@@ -1,7 +1,9 @@
 package com.example.fintar.service;
 
 import com.example.fintar.dto.RoleRequest;
+import com.example.fintar.dto.RoleResponse;
 import com.example.fintar.entity.Role;
+import com.example.fintar.mapper.RoleMapper;
 import com.example.fintar.repository.RoleRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,21 +20,22 @@ public class RoleService {
     @Autowired
     RoleRepository roleRepository;
 
+    @Autowired
+    RoleMapper roleMapper;
+
     @Cacheable(value = "roles")
-    public List<Role> getAllRole() {
-        return roleRepository.findAll();
+    public List<RoleResponse> getAllRole() {
+        return roleMapper.toResponseList(roleRepository.findAll());
     }
 
     @Transactional
     @CacheEvict(value = "roles", allEntries = true)
-    public Role createRole(RoleRequest req) {
-        Role role = Role.builder()
-                .name(req.getName())
-                .build();
-        return roleRepository.save(role);
+    public RoleResponse createRole(RoleRequest req) {
+        Role role = roleMapper.fromRequest(req);
+        return roleMapper.toResponse(roleRepository.save(role));
     }
 
-    public Set<Role> getRolesByName(Set<String> names) {
+    public Set<Role> getRolesEntityByName(Set<String> names) {
         return roleRepository.findByNames(names);
     }
 }

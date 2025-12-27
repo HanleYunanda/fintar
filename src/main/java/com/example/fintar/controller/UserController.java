@@ -2,6 +2,7 @@ package com.example.fintar.controller;
 
 import com.example.fintar.base.ApiResponse;
 import com.example.fintar.dto.UserRequest;
+import com.example.fintar.dto.UserResponse;
 import com.example.fintar.entity.User;
 import com.example.fintar.service.UserService;
 import com.example.fintar.util.ResponseUtil;
@@ -21,33 +22,33 @@ public class UserController {
     private UserService userService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<User>>> index() {
-        List<User> users = userService.getAllUser();
+    public ResponseEntity<ApiResponse<List<UserResponse>>> index() {
+        List<UserResponse> users = userService.getAllUser();
         return ResponseUtil.ok(users, "Successfully get all users");
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<User>> create(
+    public ResponseEntity<ApiResponse<UserResponse>> create(
             @RequestBody @Valid UserRequest req
     ) {
-        User createdUser = userService.createUser(req);
+        UserResponse createdUser = userService.createUser(req);
         return ResponseUtil.created(createdUser, "Successfully create new user");
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<User>> show(
+    public ResponseEntity<ApiResponse<UserResponse>> show(
             @PathVariable UUID id
     ) {
-        User user = userService.getUser(id);
+        UserResponse user = userService.getUser(id);
         return ResponseUtil.ok(user, "Successfully get user");
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<User>> update(
+    public ResponseEntity<ApiResponse<UserResponse>> update(
             @PathVariable UUID id,
             @RequestBody @Valid UserRequest req
     ) {
-        User user = userService.updateUser(id, req);
+        UserResponse user = userService.updateUser(id, req);
         return ResponseUtil.ok(user, "Successfully update user");
     }
 

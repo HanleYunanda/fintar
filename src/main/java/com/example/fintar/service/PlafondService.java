@@ -2,9 +2,11 @@ package com.example.fintar.service;
 
 import com.example.fintar.base.ApiResponse;
 import com.example.fintar.dto.PlafondRequest;
+import com.example.fintar.dto.PlafondResponse;
 import com.example.fintar.entity.Plafond;
 import com.example.fintar.entity.User;
 import com.example.fintar.exception.ResourceNotFoundException;
+import com.example.fintar.mapper.PlafondMapper;
 import com.example.fintar.repository.PlafondRepository;
 import com.example.fintar.util.ResponseUtil;
 import jakarta.transaction.Transactional;
@@ -26,48 +28,45 @@ public class PlafondService {
     private PlafondRepository plafondRepository;
 
     @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private AuthService authService;
+    private PlafondMapper plafondMapper;
 
     @Cacheable(value = "plafonds")
-    public List<Plafond> getAllPlafond() {
-        return plafondRepository.findAll();
+    public List<PlafondResponse> getAllPlafond() {
+        return plafondMapper.toResponseList(plafondRepository.findAll());
     }
 
     @Transactional
     @CacheEvict(value = "plafonds", allEntries = true)
-    public Plafond createPlafond(PlafondRequest req) {
+    public PlafondResponse createPlafond(PlafondRequest req) {
 
-        Plafond plafond = Plafond.builder()
-                .name(req.getName())
-                .maxAmount(req.getMaxAmount())
-                .maxTenor(req.getMaxTenor())
-                .build();
-        return plafondRepository.save(plafond);
+        Plafond plafond = plafondMapper.fromRequest(req);
+        return plafondMapper.toResponse(plafondRepository.save(plafond));
     }
 
-    public Plafond getPlafond(UUID id) {
+    public Plafond getPlafondEntity(UUID id) {
         Optional<Plafond> plafond = plafondRepository.findById(id);
         if(plafond.isEmpty()) throw new ResourceNotFoundException("Plafond with id " + id + " not found");
         return plafond.get();
     }
 
+    public PlafondResponse getPlafond(UUID id) {
+        return plafondMapper.toResponse(this.getPlafondEntity(id));
+    }
+
     @Transactional
     @CacheEvict(value = "plafonds", allEntries = true)
-    public Plafond updatePlafond(UUID id, PlafondRequest req) {
-        Plafond plafond = this.getPlafond(id);
+    public PlafondResponse updatePlafond(UUID id, PlafondRequest req) {
+        Plafond plafond = this.getPlafondEntity(id);
         plafond.setName(req.getName());
         plafond.setMaxAmount(req.getMaxAmount());
         plafond.setMaxTenor(req.getMaxTenor());
-        return plafondRepository.save(plafond);
+        return plafondMapper.toResponse(plafondRepository.save(plafond));
     }
 
     @Transactional
     @CacheEvict(value = "plafonds", allEntries = true)
     public void deletePlafond(UUID id) {
-        Plafond plafond = this.getPlafond(id);
+        Plafond plafond = this.getPlafondEntity(id);
         plafondRepository.delete(plafond);
     }
 }

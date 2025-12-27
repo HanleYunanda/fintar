@@ -2,6 +2,7 @@ package com.example.fintar.controller;
 
 import com.example.fintar.base.ApiResponse;
 import com.example.fintar.dto.PlafondRequest;
+import com.example.fintar.dto.PlafondResponse;
 import com.example.fintar.dto.UserRequest;
 import com.example.fintar.entity.Plafond;
 import com.example.fintar.entity.User;
@@ -25,33 +26,33 @@ public class PlafondController {
     private PlafondService plafondService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Plafond>>> index() {
-        List<Plafond> plafonds = plafondService.getAllPlafond();
+    public ResponseEntity<ApiResponse<List<PlafondResponse>>> index() {
+        List<PlafondResponse> plafonds = plafondService.getAllPlafond();
         return ResponseUtil.ok(plafonds, "Successfully get all plafonds");
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Plafond>> create(
+    public ResponseEntity<ApiResponse<PlafondResponse>> create(
             @RequestBody @Valid PlafondRequest req
     ) {
-        Plafond createdPlafond = plafondService.createPlafond(req);
+        PlafondResponse createdPlafond = plafondService.createPlafond(req);
         return ResponseUtil.ok(createdPlafond, "Successfully create new user");
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<Plafond>> show(
+    public ResponseEntity<ApiResponse<PlafondResponse>> show(
             @PathVariable UUID id
     ) {
-        Plafond plafond = plafondService.getPlafond(id);
+        PlafondResponse plafond = plafondService.getPlafond(id);
         return ResponseUtil.ok(plafond, "Successfully get plafond");
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<Plafond>> update(
+    public ResponseEntity<ApiResponse<PlafondResponse>> update(
             @PathVariable UUID id,
             @RequestBody @Valid PlafondRequest req
     ) {
-        Plafond plafond = plafondService.updatePlafond(id, req);
+        PlafondResponse plafond = plafondService.updatePlafond(id, req);
         return ResponseUtil.ok(plafond, "Successfully update plafond");
     }
 
