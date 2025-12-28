@@ -2,14 +2,18 @@ package com.example.fintar.filter;
 
 import com.example.fintar.exception.InvalidJwtException;
 import com.example.fintar.service.CustomUserDetailsService;
+import com.example.fintar.service.JwtBlacklistService;
 import com.example.fintar.service.JwtService;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,16 +26,13 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 import java.io.IOException;
 
 @Component
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private HandlerExceptionResolver handlerExceptionResolver;
-
-    @Autowired
-    private JwtService jwtService;
-
-    @Autowired
-    private CustomUserDetailsService userDetailsService;
+    private final HandlerExceptionResolver handlerExceptionResolver;
+    private final JwtService jwtService;
+    private final CustomUserDetailsService userDetailsService;
+    private final JwtBlacklistService jwtBlacklistService;
 
     @Override
     protected void doFilterInternal(
@@ -47,10 +48,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         final String jwt = authHeader.substring(7);
-        final String username;
+        Claims claims;
 
         try {
-            username = jwtService.extractClaims(jwt).getSubject();
+            claims = jwtService.extractClaims(jwt);
+//            username = jwtService.extractClaims(jwt).getSubject();
         } catch (JwtException e) {
             // JWT invalid → authentication failure
 //            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT");
@@ -58,12 +60,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throw new InvalidJwtException("Invalid JWT");
         }
 
+        if (jwtBlacklistService.isBlacklisted(claims.getId())) throw new AuthorizationDeniedException("Unauthorized");
+
         Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
 
-        if (username != null && authentication == null) {
+        if (claims.getSubject() != null && authentication == null) {
             UserDetails userDetails =
-                    userDetailsService.loadUserByUsername(username);
+                    userDetailsService.loadUserByUsername(claims.getSubject());
 
             if (jwtService.isTokenValid(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken =

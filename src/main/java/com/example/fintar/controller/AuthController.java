@@ -8,18 +8,18 @@ import com.example.fintar.dto.RegisterUserRequest;
 import com.example.fintar.entity.User;
 import com.example.fintar.entity.UserPrincipal;
 import com.example.fintar.service.AuthService;
+import com.example.fintar.service.JwtBlacklistService;
 import com.example.fintar.service.JwtService;
 import com.example.fintar.util.ResponseUtil;
+import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -31,8 +31,9 @@ public class AuthController {
 
     private final AuthService authService;
     private final JwtService jwtService;
+    private final JwtBlacklistService jwtBlacklistService;
 
-    @GetMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<ApiResponse<String>> login(
             @RequestBody @Valid LoginUserRequest req
             ) {
@@ -45,7 +46,7 @@ public class AuthController {
         );
     }
 
-    @GetMapping("/signup")
+    @PostMapping("/signup")
     public ResponseEntity<ApiResponse<User>> signup(
             @RequestBody @Valid RegisterUserRequest req
             ) {
@@ -55,8 +56,8 @@ public class AuthController {
 
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
-    public CurrentUserResponse getCurrentUser(@AuthenticationPrincipal UserPrincipal currentUser) {
-        return CurrentUserResponse.builder()
+    public ResponseEntity<ApiResponse<CurrentUserResponse>> getCurrentUser(@AuthenticationPrincipal UserPrincipal currentUser) {
+        CurrentUserResponse currentUserResponse = CurrentUserResponse.builder()
                 .username(currentUser.getUsername())
                 .email(currentUser.getUser().getEmail())
                 .roles(currentUser.getAuthorities().stream()
@@ -68,6 +69,31 @@ public class AuthController {
                         .map(a -> a.getAuthority())
                         .collect(Collectors.toSet()))
                 .build();
+        return ResponseUtil.ok(currentUserResponse, "Successfully get logged in user");
     }
 
+    @PostMapping("/logout")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<String>> logout(
+            HttpServletRequest request
+    ) {
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseUtil.ok(null, "No token provided");
+        }
+
+        String token = authHeader.substring(7);
+        Claims claims = jwtService.extractClaims(token);
+        String jti = claims.getId();
+
+        Long expMillis = claims.getExpiration().getTime();
+        Long nowMillis = System.currentTimeMillis();
+        Long ttl = expMillis - nowMillis;
+
+        if (ttl > 0) {
+            jwtBlacklistService.blacklist(jti, ttl);
+        }
+        return ResponseUtil.ok(null, "Successfully logged out");
+    }
 }
