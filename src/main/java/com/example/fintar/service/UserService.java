@@ -8,24 +8,25 @@ import com.example.fintar.exception.ResourceNotFoundException;
 import com.example.fintar.mapper.UserMapper;
 import com.example.fintar.repository.RoleRepository;
 import com.example.fintar.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private RoleService roleService;
-
-    @Autowired
-    private UserMapper userMapper;
+    private final UserRepository userRepository;
+    private final RoleService roleService;
+    private final UserMapper userMapper;
 
     public List<UserResponse> getAllUser() {
         return userMapper.toResponseList(userRepository.findAll());
@@ -33,13 +34,14 @@ public class UserService {
 
     public UserResponse createUser(UserRequest req) {
         // Jika roles di request kosong kasih default role CUSTOMER
-        if(req.getRoles().isEmpty()) {
+        if (req.getRoles().isEmpty()) {
             req.setRoles(Set.of("CUSTOMER"));
         }
 
         // Ambil roles dari DB
         Set<Role> roles = roleService.getRolesEntityByName(req.getRoles());
-        if(roles.isEmpty()) throw new ResourceNotFoundException("Create base roles first");
+        if (roles.isEmpty())
+            throw new ResourceNotFoundException("Create base roles first");
 
         User user = User.builder()
                 .username(req.getUsername())
@@ -55,14 +57,14 @@ public class UserService {
 
     public User getUserEntity(UUID id) {
         Optional<User> user = userRepository.findById(id);
-        if(user.isEmpty()) throw new ResourceNotFoundException("User with id " + id + " not found");
+        if (user.isEmpty())
+            throw new ResourceNotFoundException("User with id " + id + " not found");
         return user.get();
     }
 
     public UserResponse getUser(UUID id) {
         return userMapper.toResponse(
-                this.getUserEntity(id)
-        );
+                this.getUserEntity(id));
     }
 
     public UserResponse updateUser(UUID id, UserRequest userRequest) {
@@ -77,4 +79,5 @@ public class UserService {
         User user = this.getUserEntity(id);
         userRepository.delete(user);
     }
+
 }

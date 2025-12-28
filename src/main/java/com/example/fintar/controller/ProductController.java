@@ -10,12 +10,14 @@ import com.example.fintar.util.ResponseUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/products")
+@RequestMapping("/product")
+@PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
 public class ProductController {
 

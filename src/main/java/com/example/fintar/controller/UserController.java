@@ -7,27 +7,32 @@ import com.example.fintar.entity.User;
 import com.example.fintar.service.UserService;
 import com.example.fintar.util.ResponseUtil;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/users")
+@RequiredArgsConstructor
+@RequestMapping("/user")
+@PreAuthorize("hasRole('ADMIN')")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
     @GetMapping
+    @PreAuthorize("hasAuthority('READ_USER')")
     public ResponseEntity<ApiResponse<List<UserResponse>>> index() {
         List<UserResponse> users = userService.getAllUser();
         return ResponseUtil.ok(users, "Successfully get all users");
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('CREATE_USER')")
     public ResponseEntity<ApiResponse<UserResponse>> create(
             @RequestBody @Valid UserRequest req
     ) {
@@ -36,6 +41,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('READ_USER')")
     public ResponseEntity<ApiResponse<UserResponse>> show(
             @PathVariable UUID id
     ) {
@@ -44,6 +50,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('UPDATE_USER')")
     public ResponseEntity<ApiResponse<UserResponse>> update(
             @PathVariable UUID id,
             @RequestBody @Valid UserRequest req
@@ -53,6 +60,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('DELETE_USER')")
     public ResponseEntity<ApiResponse<User>> delete(
             @PathVariable UUID id
     ) {

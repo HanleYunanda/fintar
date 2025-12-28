@@ -9,6 +9,7 @@ import com.example.fintar.entity.User;
 import com.example.fintar.service.PlafondService;
 import com.example.fintar.util.ResponseUtil;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
@@ -19,11 +20,12 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/plafonds")
+@RequestMapping("/plafond")
+@PreAuthorize("hasRole('ADMIN')")
+@RequiredArgsConstructor
 public class PlafondController {
 
-    @Autowired
-    private PlafondService plafondService;
+    private final PlafondService plafondService;
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<PlafondResponse>>> index() {

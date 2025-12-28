@@ -4,10 +4,7 @@ import com.example.fintar.enums.HouseStatus;
 import com.example.fintar.enums.MaritalStatus;
 import com.example.fintar.enums.Religion;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -16,7 +13,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "customer_details")
-@Data
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

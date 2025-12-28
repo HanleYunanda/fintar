@@ -1,6 +1,7 @@
 package com.example.fintar.service;
 
 import com.example.fintar.entity.User;
+import com.example.fintar.entity.UserPrincipal;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -58,7 +59,7 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public Map<String, Object> generateExtraClaims(User autenticatedUser) {
+    public Map<String, Object> generateExtraClaims(UserPrincipal autenticatedUser) {
         Map<String, Object> extraClaims = new HashMap<>();
         extraClaims.put(
                 "authorities",

@@ -1,6 +1,7 @@
 package com.example.fintar.filter;
 
 import com.example.fintar.exception.InvalidJwtException;
+import com.example.fintar.service.CustomUserDetailsService;
 import com.example.fintar.service.JwtService;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -30,7 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private JwtService jwtService;
 
     @Autowired
-    private UserDetailsService userDetailsService;
+    private CustomUserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(

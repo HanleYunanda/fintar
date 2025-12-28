@@ -11,6 +11,7 @@ import com.example.fintar.repository.PlafondRepository;
 import com.example.fintar.util.ResponseUtil;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -22,13 +23,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class PlafondService {
 
-    @Autowired
-    private PlafondRepository plafondRepository;
-
-    @Autowired
-    private PlafondMapper plafondMapper;
+    private final PlafondRepository plafondRepository;
+    private final PlafondMapper plafondMapper;
 
     @Cacheable(value = "plafonds")
     public List<PlafondResponse> getAllPlafond() {

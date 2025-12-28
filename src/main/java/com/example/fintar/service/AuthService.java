@@ -4,8 +4,10 @@ import com.example.fintar.dto.LoginUserRequest;
 import com.example.fintar.dto.RegisterUserRequest;
 import com.example.fintar.entity.Role;
 import com.example.fintar.entity.User;
+import com.example.fintar.entity.UserPrincipal;
 import com.example.fintar.repository.UserRepository;
 import io.jsonwebtoken.Jwt;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,15 +22,13 @@ import java.util.Collection;
 import java.util.Set;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    @Autowired
-    private AuthenticationManager authenticationManager;
-    @Autowired
-    private RoleService roleService;
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final RoleService roleService;
 
     public User register(RegisterUserRequest req) {
         User user = User.builder()
@@ -41,15 +41,14 @@ public class AuthService {
         return userRepository.save(user);
     }
 
-    public User authenticate(LoginUserRequest req) {
-        authenticationManager.authenticate(
+    public UserPrincipal authenticate(LoginUserRequest req) {
+        Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         req.getUsername(),
                         req.getPassword()
                 )
         );
-        return userRepository.findByUsername(req.getUsername())
-                .orElseThrow();
+        return (UserPrincipal) auth.getPrincipal();
     }
 
     public void getAuthenticatedUser() {
