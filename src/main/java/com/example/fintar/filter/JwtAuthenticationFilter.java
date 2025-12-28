@@ -24,6 +24,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -33,6 +34,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
     private final JwtBlacklistService jwtBlacklistService;
+
+    private static final List<String> WHITELIST = List.of(
+            "/auth/login",
+            "/auth/register"
+    );
 
     @Override
     protected void doFilterInternal(
@@ -87,5 +93,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        return WHITELIST.stream().anyMatch(path::startsWith);
     }
 }

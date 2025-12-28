@@ -1,6 +1,7 @@
 package com.example.fintar.config;
 
 import com.example.fintar.entity.User;
+import com.example.fintar.entity.UserPrincipal;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,7 +21,7 @@ public class AuditorAwareImpl implements AuditorAware<UUID> {
             return Optional.of(UUID.fromString("00000000-0000-0000-0000-000000000000"));
         }
 
-        User user = (User) auth.getPrincipal();
-        return Optional.of(user.getId());
+        UserPrincipal user = (UserPrincipal) auth.getPrincipal();
+        return Optional.of(user.getUser().getId());
     }
 }
