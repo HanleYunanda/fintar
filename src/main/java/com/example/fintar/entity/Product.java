@@ -1,14 +1,12 @@
 package com.example.fintar.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Entity
 @Table(name = "products")
@@ -29,5 +27,8 @@ public class Product extends BaseEntity implements Serializable {
 
     @Column(nullable = false)
     private Double interestRate;
+
+    @OneToMany(mappedBy = "product")
+    private List<Loan> loans;
 
 }

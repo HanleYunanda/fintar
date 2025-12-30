@@ -45,6 +45,9 @@ public class User extends BaseEntity {
     @OneToOne(mappedBy = "user")
     private CustomerDetail customerDetail;
 
+    @OneToMany(mappedBy = "performedBy")
+    private List<LoanStatusHistory> loanStatusHistory;
+
     /*
       id uuid pk DONE
       username string DONE
