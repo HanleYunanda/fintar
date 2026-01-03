@@ -16,14 +16,14 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@SQLDelete(sql = "UPDATE loan_status_histories SET is_deleted = 1 WHERE id = ?")
-@SQLRestriction("is_deleted = 0")
+//@SQLDelete(sql = "UPDATE loan_status_histories SET is_deleted = 1 WHERE id = ?")
+//@SQLRestriction("is_deleted = 0")
 public class LoanStatusHistory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @EqualsAndHashCode.Include
-    protected UUID id;
+    private UUID id;
 
     @ManyToOne
     private Loan loan;

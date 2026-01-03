@@ -1,10 +1,12 @@
 package com.example.fintar.entity;
 
+import com.example.fintar.enums.LoanStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -22,10 +24,10 @@ public class Loan extends BaseEntity {
     private Product product;
 
     @Column(nullable = false)
-    private Double principalDebt;
+    private Long principalDebt;
 
     @Column(nullable = false)
-    private Double outstandingDebt;
+    private Long outstandingDebt;
 
     @Column(nullable = false)
     private Integer tenor;
@@ -34,12 +36,14 @@ public class Loan extends BaseEntity {
     private Double interestRate;
 
     @Column(nullable = false)
-    private Double installmentPayment;
+    private Long installmentPayment;
 
     @Column(nullable = false)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private LoanStatus status;
 
     @OneToMany(mappedBy = "loan")
-    private List<LoanStatusHistory> statusHistories;
+    @Builder.Default
+    private List<LoanStatusHistory> statusHistories = new ArrayList<>();
 
 }

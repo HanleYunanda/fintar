@@ -6,6 +6,7 @@ import com.example.fintar.dto.ProductResponse;
 import com.example.fintar.entity.Plafond;
 import com.example.fintar.entity.Product;
 import com.example.fintar.exception.BusinessValidationException;
+import com.example.fintar.exception.ResourceNotFoundException;
 import com.example.fintar.mapper.ProductMapper;
 import com.example.fintar.repository.ProductRepository;
 import jakarta.validation.Valid;
@@ -15,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -41,5 +44,11 @@ public class ProductService {
         Product product = productMapper.fromRequest(req);
         product.setPlafond(plafond);
         return productMapper.toResponse(productRepository.save(product));
+    }
+
+    public Product getProductEntityById(UUID id) {
+        Optional<Product> product = productRepository.findById(id);
+        if(product.isEmpty()) throw new ResourceNotFoundException("Product with id " + id + " not found");
+        return product.get();
     }
 }
