@@ -32,6 +32,7 @@ public class LoanService {
     private final ProductService productService;
     private final LoanMapper loanMapper;
     private final LoanStatusHistoryMapper loanStatusHistoryMapper;
+    private final UserService userService;
 
     public List<LoanResponse> getAllLoan() {
         return loanMapper.toResponseList(loanRepository.findAll());
@@ -127,6 +128,11 @@ public class LoanService {
         return loanStatusHistories;
     }
 
+    public CustomerDetail getCustomerDetailEntityForLoan(Loan loan) {
+        User user = userService.getUserEntity(loan.getCreatedBy());
+        return user.getCustomerDetail();
+    }
+
     @Transactional
     public LoanStatusHistoryResponse reviewLoanApplication(UUID id, ChangeLoanStatusRequest req) {
         // Check : action must be REVIEWED
@@ -134,6 +140,9 @@ public class LoanService {
 
         // Get loan
         Loan loan = this.getLoanEntityById(id);
+
+        // Check : status must be created
+        if(loan.getStatus() != LoanStatus.CREATED) throw new BusinessValidationException("Loan application has not been created");
 
         return loanStatusHistoryMapper.toResponse(this.changeStatusApproval(loan, req));
     }
@@ -150,9 +159,10 @@ public class LoanService {
         Loan loan = this.getLoanEntityById(id);
 
         // Check : loan must be reviewed first
-        Optional<LoanStatusHistory> isReviewed = loanStatusHistoryRepository.findFirstByLoanOrderByPerformedAtDesc(loan);
-        if(isReviewed.isEmpty()) throw new BusinessValidationException("Loan application has not been reviewed");
-        if(isReviewed.get().getAction() != LoanStatus.REVIEWED) throw new BusinessValidationException("Loan application has not been reviewed");
+//        Optional<LoanStatusHistory> isReviewed = loanStatusHistoryRepository.findFirstByLoanOrderByPerformedAtDesc(loan);
+//        if(isReviewed.isEmpty()) throw new BusinessValidationException("Loan application has not been reviewed");
+//        if(isReviewed.get().getAction() != LoanStatus.REVIEWED) throw new BusinessValidationException("Loan application has not been reviewed");
+        if(loan.getStatus() != LoanStatus.REVIEWED) throw new BusinessValidationException("Loan application has not been reviewed");
 
         return loanStatusHistoryMapper.toResponse(this.changeStatusApproval(loan, req));
     }
@@ -165,9 +175,10 @@ public class LoanService {
         Loan loan = this.getLoanEntityById(id);
 
         // Check : loan must be approved first
-        Optional<LoanStatusHistory> isApproved = loanStatusHistoryRepository.findFirstByLoanOrderByPerformedAtDesc(loan);
-        if(isApproved.isEmpty()) throw new BusinessValidationException("Loan application has not been approved");
-        if(isApproved.get().getAction() != LoanStatus.APPROVED) throw new BusinessValidationException("Loan application has not been approved");
+        if(loan.getStatus() != LoanStatus.APPROVED) throw new BusinessValidationException("Loan application has not been approved");
+//        Optional<LoanStatusHistory> isApproved = loanStatusHistoryRepository.findFirstByLoanOrderByPerformedAtDesc(loan);
+//        if(isApproved.isEmpty()) throw new BusinessValidationException("Loan application has not been approved");
+//        if(isApproved.get().getAction() != LoanStatus.APPROVED) throw new BusinessValidationException("Loan application has not been approved");
 
         return loanStatusHistoryMapper.toResponse(this.changeStatusApproval(loan, req));
     }
@@ -185,6 +196,8 @@ public class LoanService {
                 .performedBy(userPrincipal.getUser())
                 .performedAt(LocalDateTime.now())
                 .build();
+        loan.setStatus(req.getAction());
+        loanRepository.save(loan);
         return loanStatusHistoryRepository.save(loanStatusHistory);
     }
 

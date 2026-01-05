@@ -46,4 +46,12 @@ public class Loan extends BaseEntity {
     @Builder.Default
     private List<LoanStatusHistory> statusHistories = new ArrayList<>();
 
+//    @ManyToMany
+//    @JoinTable(
+//            name = "loan_documents",
+//            joinColumns = @JoinColumn(name = "loan_id"),
+//            inverseJoinColumns = @JoinColumn(name = "document_id")
+//    )
+//    private List<Document> documents;
+
 }

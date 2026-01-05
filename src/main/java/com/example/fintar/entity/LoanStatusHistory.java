@@ -29,6 +29,7 @@ public class LoanStatusHistory {
     private Loan loan;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private LoanStatus action;
 
     private String note;

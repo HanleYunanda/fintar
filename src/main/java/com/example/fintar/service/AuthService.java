@@ -51,9 +51,9 @@ public class AuthService {
         return (UserPrincipal) auth.getPrincipal();
     }
 
-    public void getAuthenticatedUser() {
+    public UserPrincipal getAuthenticatedUser() {
         Authentication auth =
                 SecurityContextHolder.getContext().getAuthentication();
-        System.out.println(auth);
+        return (UserPrincipal) auth.getPrincipal();
     }
 }

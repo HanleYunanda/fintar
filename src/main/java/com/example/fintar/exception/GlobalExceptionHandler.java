@@ -2,6 +2,7 @@ package com.example.fintar.exception;
 
 import com.example.fintar.base.ApiResponse;
 import com.example.fintar.util.ResponseUtil;
+import org.apache.coyote.BadRequestException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

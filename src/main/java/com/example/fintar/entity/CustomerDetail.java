@@ -10,6 +10,7 @@ import org.hibernate.annotations.SQLRestriction;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "customer_details")
@@ -59,4 +60,7 @@ public class CustomerDetail extends BaseEntity implements Serializable {
     private Double salary;
 
     private String accountNumber;
+
+    @OneToMany(mappedBy = "customerDetail")
+    private List<Document> documents;
 }

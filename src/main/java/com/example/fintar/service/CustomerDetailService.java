@@ -23,6 +23,7 @@ public class CustomerDetailService {
     private final CustomerDetailRepository customerDetailRepository;
     private final CustomerDetailMapper customerDetailMapper;
     private final UserService userService;
+    private final AuthService authService;
 
     public List<CustomerDetailResponse> getAllCustomerDetail() {
         List<CustomerDetail> customerDetails = customerDetailRepository.findAll();
@@ -74,5 +75,12 @@ public class CustomerDetailService {
         Optional<CustomerDetail> customerDetail = customerDetailRepository.findById(id);
         if(customerDetail.isEmpty()) throw new ResourceNotFoundException("Customer detail not found");
         return customerDetail.get();
+    }
+
+    public CustomerDetail getCustomerDetailEntityByLoggedInUser() {
+        User user = authService.getAuthenticatedUser().getUser();
+        CustomerDetail customerDetail = user.getCustomerDetail();
+        if(customerDetail == null) throw new ResourceNotFoundException("Customer detail not found");
+        return customerDetail;
     }
 }
