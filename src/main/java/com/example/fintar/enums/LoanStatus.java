@@ -1,10 +1,9 @@
 package com.example.fintar.enums;
 
-
 public enum LoanStatus {
-    CREATED,
-    REVIEWED,
-    APPROVED,
-    REJECTED,
-    DISBURESED
+  CREATED,
+  REVIEWED,
+  APPROVED,
+  REJECTED,
+  DISBURESED
 }

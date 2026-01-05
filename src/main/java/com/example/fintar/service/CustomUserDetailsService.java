@@ -14,18 +14,17 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserRepository userRepository;
+  private final UserRepository userRepository;
 
-    @Override
-    @Transactional(readOnly = true)
-    public UserDetails loadUserByUsername(String username) {
+  @Override
+  @Transactional(readOnly = true)
+  public UserDetails loadUserByUsername(String username) {
 
-        User user = userRepository.findByUsernameWithRolesAndPermissions(username)
-                .orElseThrow(() ->
-                        new UsernameNotFoundException("User not found"));
+    User user =
+        userRepository
+            .findByUsernameWithRolesAndPermissions(username)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        return UserPrincipal.builder()
-                .user(user)
-                .build();
-    }
+    return UserPrincipal.builder().user(user).build();
+  }
 }

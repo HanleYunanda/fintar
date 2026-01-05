@@ -12,193 +12,218 @@ import com.example.fintar.mapper.LoanMapper;
 import com.example.fintar.mapper.LoanStatusHistoryMapper;
 import com.example.fintar.repository.LoanRepository;
 import com.example.fintar.repository.LoanStatusHistoryRepository;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 public class LoanService {
 
-    private final LoanRepository loanRepository;
-    private final LoanStatusHistoryRepository loanStatusHistoryRepository;
-    private final ProductService productService;
-    private final LoanMapper loanMapper;
-    private final LoanStatusHistoryMapper loanStatusHistoryMapper;
-    private final UserService userService;
+  private final LoanRepository loanRepository;
+  private final LoanStatusHistoryRepository loanStatusHistoryRepository;
+  private final ProductService productService;
+  private final LoanMapper loanMapper;
+  private final LoanStatusHistoryMapper loanStatusHistoryMapper;
+  private final UserService userService;
 
-    public List<LoanResponse> getAllLoan() {
-        return loanMapper.toResponseList(loanRepository.findAll());
+  public List<LoanResponse> getAllLoan() {
+    return loanMapper.toResponseList(loanRepository.findAll());
+  }
+
+  @Transactional
+  public LoanResponse createLoanApplication(LoanRequest req) {
+
+    // Get product by id
+    Product product = productService.getProductEntityById(req.getProductId());
+    // Get plafond
+    Plafond plafond = product.getPlafond();
+
+    // Check if principal debt submitted is less than max amount allowed
+    if (req.getPrincipalDebt() > plafond.getMaxAmount())
+      throw new BusinessValidationException("Loan exceeding the permitted limit");
+
+    // Check if tenor submitted is less than max tenor allowed
+    if (req.getTenor() > plafond.getMaxTenor())
+      throw new BusinessValidationException("Tenor exceeding the permitted limit");
+
+    // Check simulation result
+    Long interestAmount =
+        Math.round(req.getPrincipalDebt() * (req.getInterestRate() / 100) * req.getTenor());
+    //        System.out.println(interestAmount);
+    Long outstandingDebt = req.getPrincipalDebt() + interestAmount;
+    //        System.out.println(outstandingDebt);
+    Long installmentPayment = outstandingDebt / req.getTenor();
+    //        System.out.println(outstandingDebt / req.getTenor());
+    //        System.out.println(installmentPayment);
+    if (!outstandingDebt.equals(req.getOutstandingDebt()))
+      throw new BusinessValidationException("Incorrect calculation of outstanding debt");
+    if (!installmentPayment.equals(req.getInstallmentPayment()))
+      throw new BusinessValidationException("Incorrect calculation of installment payment");
+
+    // Get logged in user
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
+
+    // Get Customer detail
+    CustomerDetail customerDetail = userPrincipal.getUser().getCustomerDetail();
+    // Check : if there are null field in customer detail
+    if (customerDetail == null
+        || customerDetail.getFullName() == null
+        || customerDetail.getFullName().isBlank()
+        || customerDetail.getNationalId() == null
+        || customerDetail.getNationalId().isBlank()
+        || customerDetail.getCitizenship() == null
+        || customerDetail.getCitizenship().isBlank()
+        || customerDetail.getPlaceOfBirth() == null
+        || customerDetail.getPlaceOfBirth().isBlank()
+        || customerDetail.getDateOfBirth() == null
+        || customerDetail.getIsMale() == null
+        || customerDetail.getReligion() == null
+        || customerDetail.getMaritalStatus() == null
+        || customerDetail.getPhoneNumber() == null
+        || customerDetail.getPhoneNumber().isBlank()
+        || customerDetail.getAddress() == null
+        || customerDetail.getAddress().isBlank()
+        || customerDetail.getZipCode() == null
+        || customerDetail.getZipCode().isBlank()
+        || customerDetail.getHouseStatus() == null
+        || customerDetail.getJob() == null
+        || customerDetail.getJob().isBlank()
+        || customerDetail.getWorkplace() == null
+        || customerDetail.getWorkplace().isBlank()
+        || customerDetail.getSalary() == null
+        || customerDetail.getAccountNumber() == null
+        || customerDetail.getAccountNumber().isBlank()) {
+      throw new BusinessValidationException("Customer detail is not completed");
     }
 
-    @Transactional
-    public LoanResponse createLoanApplication(LoanRequest req) {
+    // Create loan
+    Loan loan =
+        Loan.builder()
+            .product(product)
+            .principalDebt(req.getPrincipalDebt())
+            .outstandingDebt(req.getOutstandingDebt())
+            .tenor(req.getTenor())
+            .interestRate(req.getInterestRate())
+            .installmentPayment(req.getInstallmentPayment())
+            .status(LoanStatus.CREATED)
+            .build();
+    loan = loanRepository.save(loan);
 
-        // Get product by id
-        Product product = productService.getProductEntityById(req.getProductId());
-        // Get plafond
-        Plafond plafond = product.getPlafond();
+    // Create loan status history
+    LoanStatusHistory loanStatusHistory =
+        LoanStatusHistory.builder()
+            .loan(loan)
+            .action(LoanStatus.CREATED)
+            .performedBy(userPrincipal.getUser())
+            .performedAt(LocalDateTime.now())
+            .build();
+    loanStatusHistory = loanStatusHistoryRepository.save(loanStatusHistory);
 
-        // Check if principal debt submitted is less than max amount allowed
-        if(req.getPrincipalDebt() > plafond.getMaxAmount()) throw new BusinessValidationException("Loan exceeding the permitted limit");
+    loan.setStatusHistories(this.getLoanStatusHistoriesEntityByLoan(loan.getId()));
+    //        loan = this.getLoanEntityById(loan.getId());
+    return loanMapper.toResponse(loan);
+  }
 
-        // Check if tenor submitted is less than max tenor allowed
-        if(req.getTenor() > plafond.getMaxTenor()) throw new BusinessValidationException("Tenor exceeding the permitted limit");
+  public Loan getLoanEntityById(UUID id) {
+    Optional<Loan> loan = loanRepository.findById(id);
+    if (loan.isEmpty()) throw new ResourceNotFoundException("Loan with id " + id + " not found");
+    return loan.get();
+  }
 
-        // Check simulation result
-        Long interestAmount = Math.round(req.getPrincipalDebt() * (req.getInterestRate()/100) * req.getTenor());
-//        System.out.println(interestAmount);
-        Long outstandingDebt = req.getPrincipalDebt() + interestAmount;
-//        System.out.println(outstandingDebt);
-        Long installmentPayment = outstandingDebt / req.getTenor();
-//        System.out.println(outstandingDebt / req.getTenor());
-//        System.out.println(installmentPayment);
-        if(!outstandingDebt.equals(req.getOutstandingDebt())) throw new BusinessValidationException("Incorrect calculation of outstanding debt");
-        if(!installmentPayment.equals(req.getInstallmentPayment())) throw new BusinessValidationException("Incorrect calculation of installment payment");
+  public List<LoanStatusHistory> getLoanStatusHistoriesEntityByLoan(UUID loanId) {
+    List<LoanStatusHistory> loanStatusHistories = loanStatusHistoryRepository.findByLoanId(loanId);
+    return loanStatusHistories;
+  }
 
-        // Get logged in user
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
+  public CustomerDetail getCustomerDetailEntityForLoan(Loan loan) {
+    User user = userService.getUserEntity(loan.getCreatedBy());
+    return user.getCustomerDetail();
+  }
 
-        // Get Customer detail
-        CustomerDetail customerDetail = userPrincipal.getUser().getCustomerDetail();
-        // Check : if there are null field in customer detail
-        if(customerDetail == null ||
-                customerDetail.getFullName() == null || customerDetail.getFullName().isBlank() ||
-                customerDetail.getNationalId() == null || customerDetail.getNationalId().isBlank() ||
-                customerDetail.getCitizenship() == null ||customerDetail.getCitizenship().isBlank() ||
-                customerDetail.getPlaceOfBirth() == null || customerDetail.getPlaceOfBirth().isBlank() ||
-                customerDetail.getDateOfBirth() == null ||
-                customerDetail.getIsMale() == null ||
-                customerDetail.getReligion() == null ||
-                customerDetail.getMaritalStatus() == null ||
-                customerDetail.getPhoneNumber() == null || customerDetail.getPhoneNumber().isBlank() ||
-                customerDetail.getAddress() == null || customerDetail.getAddress().isBlank() ||
-                customerDetail.getZipCode() == null || customerDetail.getZipCode().isBlank() ||
-                customerDetail.getHouseStatus() == null ||
-                customerDetail.getJob() == null || customerDetail.getJob().isBlank() ||
-                customerDetail.getWorkplace() == null || customerDetail.getWorkplace().isBlank() ||
-                customerDetail.getSalary() == null ||
-                customerDetail.getAccountNumber() == null || customerDetail.getAccountNumber().isBlank()
-        ) {
-            throw new BusinessValidationException("Customer detail is not completed");
-        }
+  @Transactional
+  public LoanStatusHistoryResponse reviewLoanApplication(UUID id, ChangeLoanStatusRequest req) {
+    // Check : action must be REVIEWED
+    if (req.getAction() != LoanStatus.REVIEWED)
+      throw new BusinessValidationException("Wrong action input");
 
-        // Create loan
-        Loan loan = Loan.builder()
-                .product(product)
-                .principalDebt(req.getPrincipalDebt())
-                .outstandingDebt(req.getOutstandingDebt())
-                .tenor(req.getTenor())
-                .interestRate(req.getInterestRate())
-                .installmentPayment(req.getInstallmentPayment())
-                .status(LoanStatus.CREATED)
-                .build();
-        loan = loanRepository.save(loan);
+    // Get loan
+    Loan loan = this.getLoanEntityById(id);
 
-        // Create loan status history
-        LoanStatusHistory loanStatusHistory = LoanStatusHistory.builder()
-                .loan(loan)
-                .action(LoanStatus.CREATED)
-                .performedBy(userPrincipal.getUser())
-                .performedAt(LocalDateTime.now())
-                .build();
-        loanStatusHistory = loanStatusHistoryRepository.save(loanStatusHistory);
+    // Check : status must be created
+    if (loan.getStatus() != LoanStatus.CREATED)
+      throw new BusinessValidationException("Loan application has not been created");
 
-        loan.setStatusHistories(this.getLoanStatusHistoriesEntityByLoan(loan.getId()));
-//        loan = this.getLoanEntityById(loan.getId());
-        return loanMapper.toResponse(loan);
-    }
+    return loanStatusHistoryMapper.toResponse(this.changeStatusApproval(loan, req));
+  }
 
-    public Loan getLoanEntityById(UUID id) {
-        Optional<Loan> loan = loanRepository.findById(id);
-        if(loan.isEmpty()) throw new ResourceNotFoundException("Loan with id " + id + " not found");
-        return loan.get();
-    }
+  @Transactional
+  public LoanStatusHistoryResponse approveOrRejectLoanApplication(
+      UUID id, ChangeLoanStatusRequest req) {
+    // Check : action must be APPROVED or REJECTED
+    if (req.getAction() != LoanStatus.APPROVED && req.getAction() != LoanStatus.REJECTED)
+      throw new BusinessValidationException("Wrong action input");
 
-    public List<LoanStatusHistory> getLoanStatusHistoriesEntityByLoan(UUID loanId) {
-        List<LoanStatusHistory> loanStatusHistories = loanStatusHistoryRepository.findByLoanId(loanId);
-        return loanStatusHistories;
-    }
+    // Get loan
+    Loan loan = this.getLoanEntityById(id);
 
-    public CustomerDetail getCustomerDetailEntityForLoan(Loan loan) {
-        User user = userService.getUserEntity(loan.getCreatedBy());
-        return user.getCustomerDetail();
-    }
+    // Check : loan must be reviewed first
+    //        Optional<LoanStatusHistory> isReviewed =
+    // loanStatusHistoryRepository.findFirstByLoanOrderByPerformedAtDesc(loan);
+    //        if(isReviewed.isEmpty()) throw new BusinessValidationException("Loan application has
+    // not been reviewed");
+    //        if(isReviewed.get().getAction() != LoanStatus.REVIEWED) throw new
+    // BusinessValidationException("Loan application has not been reviewed");
+    if (loan.getStatus() != LoanStatus.REVIEWED)
+      throw new BusinessValidationException("Loan application has not been reviewed");
 
-    @Transactional
-    public LoanStatusHistoryResponse reviewLoanApplication(UUID id, ChangeLoanStatusRequest req) {
-        // Check : action must be REVIEWED
-        if(req.getAction() != LoanStatus.REVIEWED) throw new BusinessValidationException("Wrong action input");
+    return loanStatusHistoryMapper.toResponse(this.changeStatusApproval(loan, req));
+  }
 
-        // Get loan
-        Loan loan = this.getLoanEntityById(id);
+  public LoanStatusHistoryResponse disburseLoanApplication(UUID id, ChangeLoanStatusRequest req) {
+    // Check : action must be DISBURESED
+    if (req.getAction() != LoanStatus.DISBURESED)
+      throw new BusinessValidationException("Wrong action input");
 
-        // Check : status must be created
-        if(loan.getStatus() != LoanStatus.CREATED) throw new BusinessValidationException("Loan application has not been created");
+    // Get loan
+    Loan loan = this.getLoanEntityById(id);
 
-        return loanStatusHistoryMapper.toResponse(this.changeStatusApproval(loan, req));
-    }
+    // Check : loan must be approved first
+    if (loan.getStatus() != LoanStatus.APPROVED)
+      throw new BusinessValidationException("Loan application has not been approved");
+    //        Optional<LoanStatusHistory> isApproved =
+    // loanStatusHistoryRepository.findFirstByLoanOrderByPerformedAtDesc(loan);
+    //        if(isApproved.isEmpty()) throw new BusinessValidationException("Loan application has
+    // not been approved");
+    //        if(isApproved.get().getAction() != LoanStatus.APPROVED) throw new
+    // BusinessValidationException("Loan application has not been approved");
 
-    @Transactional
-    public LoanStatusHistoryResponse approveOrRejectLoanApplication(UUID id, ChangeLoanStatusRequest req) {
-        // Check : action must be APPROVED or REJECTED
-        if(
-                req.getAction() != LoanStatus.APPROVED
-                        && req.getAction() != LoanStatus.REJECTED
-        ) throw new BusinessValidationException("Wrong action input");
+    return loanStatusHistoryMapper.toResponse(this.changeStatusApproval(loan, req));
+  }
 
-        // Get loan
-        Loan loan = this.getLoanEntityById(id);
+  public LoanStatusHistory changeStatusApproval(Loan loan, ChangeLoanStatusRequest req) {
+    // Get logged in user
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
 
-        // Check : loan must be reviewed first
-//        Optional<LoanStatusHistory> isReviewed = loanStatusHistoryRepository.findFirstByLoanOrderByPerformedAtDesc(loan);
-//        if(isReviewed.isEmpty()) throw new BusinessValidationException("Loan application has not been reviewed");
-//        if(isReviewed.get().getAction() != LoanStatus.REVIEWED) throw new BusinessValidationException("Loan application has not been reviewed");
-        if(loan.getStatus() != LoanStatus.REVIEWED) throw new BusinessValidationException("Loan application has not been reviewed");
-
-        return loanStatusHistoryMapper.toResponse(this.changeStatusApproval(loan, req));
-    }
-
-    public LoanStatusHistoryResponse disburseLoanApplication(UUID id, ChangeLoanStatusRequest req) {
-        // Check : action must be DISBURESED
-        if(req.getAction() != LoanStatus.DISBURESED) throw new BusinessValidationException("Wrong action input");
-
-        // Get loan
-        Loan loan = this.getLoanEntityById(id);
-
-        // Check : loan must be approved first
-        if(loan.getStatus() != LoanStatus.APPROVED) throw new BusinessValidationException("Loan application has not been approved");
-//        Optional<LoanStatusHistory> isApproved = loanStatusHistoryRepository.findFirstByLoanOrderByPerformedAtDesc(loan);
-//        if(isApproved.isEmpty()) throw new BusinessValidationException("Loan application has not been approved");
-//        if(isApproved.get().getAction() != LoanStatus.APPROVED) throw new BusinessValidationException("Loan application has not been approved");
-
-        return loanStatusHistoryMapper.toResponse(this.changeStatusApproval(loan, req));
-    }
-
-    public LoanStatusHistory changeStatusApproval(Loan loan, ChangeLoanStatusRequest req) {
-        // Get logged in user
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
-
-        // Create new status history
-        LoanStatusHistory loanStatusHistory = LoanStatusHistory.builder()
-                .loan(loan)
-                .action(req.getAction())
-                .note(req.getNote())
-                .performedBy(userPrincipal.getUser())
-                .performedAt(LocalDateTime.now())
-                .build();
-        loan.setStatus(req.getAction());
-        loanRepository.save(loan);
-        return loanStatusHistoryRepository.save(loanStatusHistory);
-    }
-
+    // Create new status history
+    LoanStatusHistory loanStatusHistory =
+        LoanStatusHistory.builder()
+            .loan(loan)
+            .action(req.getAction())
+            .note(req.getNote())
+            .performedBy(userPrincipal.getUser())
+            .performedAt(LocalDateTime.now())
+            .build();
+    loan.setStatus(req.getAction());
+    loanRepository.save(loan);
+    return loanStatusHistoryRepository.save(loanStatusHistory);
+  }
 }

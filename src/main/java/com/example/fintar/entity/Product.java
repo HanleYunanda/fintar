@@ -1,12 +1,11 @@
 package com.example.fintar.entity;
 
 import jakarta.persistence.*;
+import java.io.Serializable;
+import java.util.List;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
-
-import java.io.Serializable;
-import java.util.List;
 
 @Entity
 @Table(name = "products")
@@ -19,16 +18,14 @@ import java.util.List;
 @SQLRestriction("is_deleted = 0")
 public class Product extends BaseEntity implements Serializable {
 
-    @ManyToOne
-    private Plafond plafond;
+  @ManyToOne private Plafond plafond;
 
-    @Column(nullable = false)
-    private Integer tenor;
+  @Column(nullable = false)
+  private Integer tenor;
 
-    @Column(nullable = false)
-    private Double interestRate;
+  @Column(nullable = false)
+  private Double interestRate;
 
-    @OneToMany(mappedBy = "product")
-    private List<Loan> loans;
-
+  @OneToMany(mappedBy = "product")
+  private List<Loan> loans;
 }

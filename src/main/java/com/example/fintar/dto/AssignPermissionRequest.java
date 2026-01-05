@@ -1,12 +1,11 @@
 package com.example.fintar.dto;
 
+import java.util.Set;
 import lombok.Builder;
 import lombok.Data;
-
-import java.util.Set;
 
 @Data
 @Builder
 public class AssignPermissionRequest {
-    private Set<String> permissionCodes;
+  private Set<String> permissionCodes;
 }

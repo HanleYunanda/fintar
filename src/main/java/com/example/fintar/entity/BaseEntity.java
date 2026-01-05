@@ -1,16 +1,14 @@
 package com.example.fintar.entity;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.*;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
@@ -19,25 +17,23 @@ import java.util.UUID;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public abstract class BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @EqualsAndHashCode.Include
-    protected UUID id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
+  @EqualsAndHashCode.Include
+  protected UUID id;
 
-    @CreatedBy
-    @Column(updatable = false)
-    protected UUID createdBy;
+  @CreatedBy
+  @Column(updatable = false)
+  protected UUID createdBy;
 
-    @CreatedDate
-    @Column(updatable = false)
-    protected LocalDateTime createdAt;
+  @CreatedDate
+  @Column(updatable = false)
+  protected LocalDateTime createdAt;
 
-    @LastModifiedBy
-    protected UUID updatedBy;
+  @LastModifiedBy protected UUID updatedBy;
 
-    @LastModifiedDate
-    protected LocalDateTime updatedAt;
+  @LastModifiedDate protected LocalDateTime updatedAt;
 
-    @Column(nullable = false)
-    protected Boolean isDeleted = false;
+  @Column(nullable = false)
+  protected Boolean isDeleted = false;
 }

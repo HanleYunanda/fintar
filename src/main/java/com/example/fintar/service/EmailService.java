@@ -12,32 +12,30 @@ import org.thymeleaf.context.Context;
 @RequiredArgsConstructor
 public class EmailService {
 
-    private final JavaMailSender mailSender;
-    private final TemplateEngine templateEngine;
+  private final JavaMailSender mailSender;
+  private final TemplateEngine templateEngine;
 
-    public void sendForgotPasswordEmail(String to, String resetLink) {
+  public void sendForgotPasswordEmail(String to, String resetLink) {
 
-        try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper =
-                    new MimeMessageHelper(message, true, "UTF-8");
+    try {
+      MimeMessage message = mailSender.createMimeMessage();
+      MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setTo(to);
-            helper.setSubject("Reset Password");
-            helper.setFrom("no-reply@fintar.com");
+      helper.setTo(to);
+      helper.setSubject("Reset Password");
+      helper.setFrom("no-reply@fintar.com");
 
-            Context context = new Context();
-            context.setVariable("resetLink", resetLink);
+      Context context = new Context();
+      context.setVariable("resetLink", resetLink);
 
-            String html = templateEngine.process(
-                    "forgot-password-email-template", context);
+      String html = templateEngine.process("forgot-password-email-template", context);
 
-            helper.setText(html, true);
+      helper.setText(html, true);
 
-            mailSender.send(message);
+      mailSender.send(message);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    } catch (Exception e) {
+      e.printStackTrace();
     }
+  }
 }

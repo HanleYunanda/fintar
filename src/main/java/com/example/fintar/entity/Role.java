@@ -2,18 +2,13 @@ package com.example.fintar.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
-import org.hibernate.annotations.UpdateTimestamp;
-
 import java.io.Serializable;
-import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
+import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "roles")
@@ -34,8 +29,13 @@ public class Role extends BaseEntity implements Serializable {
   private List<User> users;
 
   @ManyToMany
-  @JoinTable(name = "role_permissions", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "permission_id"))
-  private Set<Permission> permissions = new HashSet<>();;
+  @JoinTable(
+      name = "role_permissions",
+      joinColumns = @JoinColumn(name = "role_id"),
+      inverseJoinColumns = @JoinColumn(name = "permission_id"))
+  private Set<Permission> permissions = new HashSet<>();
+
+  ;
 
   /*
    * id uuid pk DONE
