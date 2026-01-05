@@ -12,30 +12,25 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @OpenAPIDefinition(
-        info = @Info(
-                title = "Fintar API",
-                version = "1.0.0",
-                description = "API Documentation for Fintar Bank Loan System",
-                contact = @Contact(
-                        name = "Hanley Yunanda",
-                        email = "hanleyunanda25@gmail.com"
-                )
-        )
-)
+    info =
+        @Info(
+            title = "Fintar API",
+            version = "1.0.0",
+            description = "API Documentation for Fintar Bank Loan System",
+            contact = @Contact(name = "Hanley Yunanda", email = "hanleyunanda25@gmail.com")))
 public class OpenApiConfig {
 
-    @Bean
-    public OpenAPI customOpenAPI() {
-        return new OpenAPI()
-                .components(new Components()
-                        .addSecuritySchemes("bearerAuth",
-                                new SecurityScheme()
-                                        .type(SecurityScheme.Type.HTTP)
-                                        .scheme("bearer")
-                                        .bearerFormat("JWT")
-                        )
-                )
-                .addSecurityItem(new SecurityRequirement().addList("bearerAuth"));
-    }
-
+  @Bean
+  public OpenAPI customOpenAPI() {
+    return new OpenAPI()
+        .components(
+            new Components()
+                .addSecuritySchemes(
+                    "bearerAuth",
+                    new SecurityScheme()
+                        .type(SecurityScheme.Type.HTTP)
+                        .scheme("bearer")
+                        .bearerFormat("JWT")))
+        .addSecurityItem(new SecurityRequirement().addList("bearerAuth"));
+  }
 }

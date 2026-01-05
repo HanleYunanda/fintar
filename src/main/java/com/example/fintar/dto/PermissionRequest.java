@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 @Builder
 public class PermissionRequest {
-    @NotNull(message = "Code is required")
-    @NotBlank(message = "Code cannot be blank")
-    private String code;
+  @NotNull(message = "Code is required")
+  @NotBlank(message = "Code cannot be blank")
+  private String code;
 }

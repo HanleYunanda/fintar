@@ -1,19 +1,16 @@
 package com.example.fintar.controller;
 
 import com.example.fintar.base.ApiResponse;
-import com.example.fintar.dto.PlafondRequest;
-import com.example.fintar.dto.PlafondResponse;
 import com.example.fintar.dto.ProductRequest;
 import com.example.fintar.dto.ProductResponse;
 import com.example.fintar.service.ProductService;
 import com.example.fintar.util.ResponseUtil;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/product")
@@ -21,19 +18,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductController {
 
-    private final ProductService productService;
+  private final ProductService productService;
 
-    @GetMapping
-    public ResponseEntity<ApiResponse<List<ProductResponse>>> index() {
-        List<ProductResponse> products = productService.getAllProduct();
-        return ResponseUtil.ok(products, "Successfully get all products");
-    }
+  @GetMapping
+  public ResponseEntity<ApiResponse<List<ProductResponse>>> index() {
+    List<ProductResponse> products = productService.getAllProduct();
+    return ResponseUtil.ok(products, "Successfully get all products");
+  }
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<ProductResponse>> create(
-            @RequestBody @Valid ProductRequest req
-    ) {
-        ProductResponse createdProduct = productService.createProduct(req);
-        return ResponseUtil.ok(createdProduct, "Successfully create new product");
-    }
+  @PostMapping
+  public ResponseEntity<ApiResponse<ProductResponse>> create(
+      @RequestBody @Valid ProductRequest req) {
+    ProductResponse createdProduct = productService.createProduct(req);
+    return ResponseUtil.ok(createdProduct, "Successfully create new product");
+  }
 }

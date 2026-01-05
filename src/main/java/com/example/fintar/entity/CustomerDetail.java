@@ -4,13 +4,12 @@ import com.example.fintar.enums.HouseStatus;
 import com.example.fintar.enums.MaritalStatus;
 import com.example.fintar.enums.Religion;
 import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "customer_details")
@@ -23,44 +22,43 @@ import java.util.List;
 @SQLRestriction("is_deleted = 0")
 public class CustomerDetail extends BaseEntity implements Serializable {
 
-    @OneToOne
-    private User user;
+  @OneToOne private User user;
 
-    private String fullName;
+  private String fullName;
 
-    private String nationalId;
+  private String nationalId;
 
-    private String citizenship;
+  private String citizenship;
 
-    private String placeOfBirth;
+  private String placeOfBirth;
 
-    private LocalDateTime dateOfBirth;
+  private LocalDateTime dateOfBirth;
 
-    private Boolean isMale;
+  private Boolean isMale;
 
-    @Enumerated(EnumType.STRING)
-    private Religion religion;
+  @Enumerated(EnumType.STRING)
+  private Religion religion;
 
-    @Enumerated(EnumType.STRING)
-    private MaritalStatus maritalStatus;
+  @Enumerated(EnumType.STRING)
+  private MaritalStatus maritalStatus;
 
-    private String phoneNumber;
+  private String phoneNumber;
 
-    private String address;
+  private String address;
 
-    private String zipCode;
+  private String zipCode;
 
-    @Enumerated(EnumType.STRING)
-    private HouseStatus houseStatus;
+  @Enumerated(EnumType.STRING)
+  private HouseStatus houseStatus;
 
-    private String job;
+  private String job;
 
-    private String workplace;
+  private String workplace;
 
-    private Double salary;
+  private Double salary;
 
-    private String accountNumber;
+  private String accountNumber;
 
-    @OneToMany(mappedBy = "customerDetail")
-    private List<Document> documents;
+  @OneToMany(mappedBy = "customerDetail")
+  private List<Document> documents;
 }

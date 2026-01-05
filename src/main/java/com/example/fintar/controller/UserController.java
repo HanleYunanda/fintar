@@ -7,14 +7,12 @@ import com.example.fintar.entity.User;
 import com.example.fintar.service.UserService;
 import com.example.fintar.util.ResponseUtil;
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,49 +20,41 @@ import java.util.UUID;
 @PreAuthorize("hasRole('ADMIN')")
 public class UserController {
 
-    private final UserService userService;
+  private final UserService userService;
 
-    @GetMapping
-    @PreAuthorize("hasAuthority('READ_USER')")
-    public ResponseEntity<ApiResponse<List<UserResponse>>> index() {
-        List<UserResponse> users = userService.getAllUser();
-        return ResponseUtil.ok(users, "Successfully get all users");
-    }
+  @GetMapping
+  @PreAuthorize("hasAuthority('READ_USER')")
+  public ResponseEntity<ApiResponse<List<UserResponse>>> index() {
+    List<UserResponse> users = userService.getAllUser();
+    return ResponseUtil.ok(users, "Successfully get all users");
+  }
 
-    @PostMapping
-    @PreAuthorize("hasAuthority('CREATE_USER')")
-    public ResponseEntity<ApiResponse<UserResponse>> create(
-            @RequestBody @Valid UserRequest req
-    ) {
-        UserResponse createdUser = userService.createUser(req);
-        return ResponseUtil.created(createdUser, "Successfully create new user");
-    }
+  @PostMapping
+  @PreAuthorize("hasAuthority('CREATE_USER')")
+  public ResponseEntity<ApiResponse<UserResponse>> create(@RequestBody @Valid UserRequest req) {
+    UserResponse createdUser = userService.createUser(req);
+    return ResponseUtil.created(createdUser, "Successfully create new user");
+  }
 
-    @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('READ_USER')")
-    public ResponseEntity<ApiResponse<UserResponse>> show(
-            @PathVariable UUID id
-    ) {
-        UserResponse user = userService.getUser(id);
-        return ResponseUtil.ok(user, "Successfully get user");
-    }
+  @GetMapping("/{id}")
+  @PreAuthorize("hasAuthority('READ_USER')")
+  public ResponseEntity<ApiResponse<UserResponse>> show(@PathVariable UUID id) {
+    UserResponse user = userService.getUser(id);
+    return ResponseUtil.ok(user, "Successfully get user");
+  }
 
-    @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('UPDATE_USER')")
-    public ResponseEntity<ApiResponse<UserResponse>> update(
-            @PathVariable UUID id,
-            @RequestBody @Valid UserRequest req
-    ) {
-        UserResponse user = userService.updateUser(id, req);
-        return ResponseUtil.ok(user, "Successfully update user");
-    }
+  @PutMapping("/{id}")
+  @PreAuthorize("hasAuthority('UPDATE_USER')")
+  public ResponseEntity<ApiResponse<UserResponse>> update(
+      @PathVariable UUID id, @RequestBody @Valid UserRequest req) {
+    UserResponse user = userService.updateUser(id, req);
+    return ResponseUtil.ok(user, "Successfully update user");
+  }
 
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('DELETE_USER')")
-    public ResponseEntity<ApiResponse<User>> delete(
-            @PathVariable UUID id
-    ) {
-        userService.deleteUser(id);
-        return ResponseUtil.ok(null, "Successfully delete user");
-    }
+  @DeleteMapping("/{id}")
+  @PreAuthorize("hasAuthority('DELETE_USER')")
+  public ResponseEntity<ApiResponse<User>> delete(@PathVariable UUID id) {
+    userService.deleteUser(id);
+    return ResponseUtil.ok(null, "Successfully delete user");
+  }
 }

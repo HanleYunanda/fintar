@@ -7,8 +7,7 @@ import lombok.Data;
 @Data
 public class RoleRequest {
 
-    @NotNull(message = "Name is required")
-    @NotBlank(message = "Name cannot be blank")
-    private String name;
-
+  @NotNull(message = "Name is required")
+  @NotBlank(message = "Name cannot be blank")
+  private String name;
 }
