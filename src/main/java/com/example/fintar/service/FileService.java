@@ -35,7 +35,7 @@ public class FileService {
       return new FileResponse(
           storedFilename,
           file.getOriginalFilename(),
-          "/files/" + path + "/" + storedFilename,
+          "files/" + path + "/" + storedFilename,
           file.getContentType(),
           file.getSize());
 

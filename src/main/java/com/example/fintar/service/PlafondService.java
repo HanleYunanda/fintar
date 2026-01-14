@@ -22,13 +22,11 @@ public class PlafondService {
   private final PlafondRepository plafondRepository;
   private final PlafondMapper plafondMapper;
 
-  @Cacheable(value = "plafonds")
   public List<PlafondResponse> getAllPlafond() {
     return plafondMapper.toResponseList(plafondRepository.findAll());
   }
 
   @Transactional
-  @CacheEvict(value = "plafonds", allEntries = true)
   public PlafondResponse createPlafond(PlafondRequest req) {
 
     Plafond plafond = plafondMapper.fromRequest(req);
@@ -47,7 +45,6 @@ public class PlafondService {
   }
 
   @Transactional
-  @CacheEvict(value = "plafonds", allEntries = true)
   public PlafondResponse updatePlafond(UUID id, PlafondRequest req) {
     Plafond plafond = this.getPlafondEntity(id);
     plafond.setName(req.getName());
@@ -57,9 +54,15 @@ public class PlafondService {
   }
 
   @Transactional
-  @CacheEvict(value = "plafonds", allEntries = true)
   public void deletePlafond(UUID id) {
     Plafond plafond = this.getPlafondEntity(id);
     plafondRepository.delete(plafond);
   }
+
+    public Plafond getPlafondEntityByName(String name) {
+      Optional<Plafond> plafond = plafondRepository.findByName(name);
+      if (plafond.isEmpty())
+        throw new ResourceNotFoundException("Plafond with name " + name + " not found");
+      return plafond.get();
+    }
 }

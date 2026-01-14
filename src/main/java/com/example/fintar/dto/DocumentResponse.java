@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class DocumentResponse {
   private UUID id;
   private String filename;
+  private String fileUri;
   private DocType docType;
   private String contentType;
   private Long size;

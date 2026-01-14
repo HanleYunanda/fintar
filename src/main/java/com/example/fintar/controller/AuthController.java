@@ -34,11 +34,28 @@ public class AuthController {
   private final ForgotPasswordService forgotPasswordService;
 
   @PostMapping("/login")
-  public ResponseEntity<ApiResponse<String>> login(@RequestBody @Valid LoginUserRequest req) {
+  public ResponseEntity<ApiResponse<CurrentUserResponse>> login(@RequestBody @Valid LoginUserRequest req) {
     UserPrincipal authenticatedUser = authService.authenticate(req);
-    Map<String, Object> extraClaims = jwtService.generateExtraClaims(authenticatedUser);
-    String jwtToken = jwtService.generateToken(extraClaims, authenticatedUser);
-    return ResponseUtil.ok(jwtToken, "Successfully log in");
+//    Map<String, Object> extraClaims = jwtService.generateExtraClaims(authenticatedUser);
+    String jwtToken = jwtService.generateToken(authenticatedUser);
+    CurrentUserResponse currentUserResponse =
+            CurrentUserResponse.builder()
+                    .id(authenticatedUser.getUser().getId())
+                    .username(authenticatedUser.getUsername())
+                    .email(authenticatedUser.getUser().getEmail())
+                    .roles(
+                            authenticatedUser.getAuthorities().stream()
+                                    .filter(a -> a.getAuthority().startsWith("ROLE_"))
+                                    .map(a -> a.getAuthority().substring(5)) // hapus prefix "ROLE_"
+                                    .collect(Collectors.toSet()))
+                    .permissions(
+                            authenticatedUser.getAuthorities().stream()
+                                    .filter(a -> !a.getAuthority().startsWith("ROLE_"))
+                                    .map(a -> a.getAuthority())
+                                    .collect(Collectors.toSet()))
+                    .token(jwtToken)
+                    .build();
+    return ResponseUtil.ok(currentUserResponse, "Successfully log in");
   }
 
   @PostMapping("/signup")
@@ -53,6 +70,7 @@ public class AuthController {
       @AuthenticationPrincipal UserPrincipal currentUser) {
     CurrentUserResponse currentUserResponse =
         CurrentUserResponse.builder()
+            .id(currentUser.getUser().getId())
             .username(currentUser.getUsername())
             .email(currentUser.getUser().getEmail())
             .roles(

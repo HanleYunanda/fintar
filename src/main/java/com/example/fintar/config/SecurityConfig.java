@@ -5,7 +5,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -30,10 +32,13 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http.csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.disable())
-        .authorizeHttpRequests(
+            .cors(Customizer.withDefaults())
+            .authorizeHttpRequests(
             authorizationManagerRequestMatcherRegistry ->
                 authorizationManagerRequestMatcherRegistry
                     .requestMatchers(WHITE_LIST)
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/document/**")
                     .permitAll()
                     .anyRequest()
                     .authenticated())
@@ -50,8 +55,8 @@ public class SecurityConfig {
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
 
-    configuration.setAllowedOrigins(List.of("http://localhost:8005"));
-    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+    configuration.setAllowedOrigins(List.of("http://localhost:4200"));
+    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
     configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

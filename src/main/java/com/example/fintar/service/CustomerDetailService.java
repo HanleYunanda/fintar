@@ -3,6 +3,7 @@ package com.example.fintar.service;
 import com.example.fintar.dto.CustomerDetailRequest;
 import com.example.fintar.dto.CustomerDetailResponse;
 import com.example.fintar.entity.CustomerDetail;
+import com.example.fintar.entity.Document;
 import com.example.fintar.entity.User;
 import com.example.fintar.exception.BusinessValidationException;
 import com.example.fintar.exception.ResourceNotFoundException;
@@ -22,6 +23,7 @@ public class CustomerDetailService {
   private final CustomerDetailMapper customerDetailMapper;
   private final UserService userService;
   private final AuthService authService;
+  private final PlafondService plafondService;
 
   public List<CustomerDetailResponse> getAllCustomerDetail() {
     List<CustomerDetail> customerDetails = customerDetailRepository.findAll();
@@ -40,6 +42,10 @@ public class CustomerDetailService {
 
     CustomerDetail customerDetail = customerDetailMapper.fromRequest(req);
     customerDetail.setUser(user);
+
+    // Set basic plafond to new user
+    customerDetail.setPlafond(plafondService.getPlafondEntityByName("IRON"));
+
     return customerDetailMapper.toResponse(customerDetailRepository.save(customerDetail));
   }
 

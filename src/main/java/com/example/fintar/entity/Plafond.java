@@ -29,4 +29,7 @@ public class Plafond extends BaseEntity implements Serializable {
 
   @OneToMany(mappedBy = "plafond")
   private List<Product> products;
+
+  @OneToMany(mappedBy = "plafond")
+  private List<CustomerDetail> customerDetails;
 }

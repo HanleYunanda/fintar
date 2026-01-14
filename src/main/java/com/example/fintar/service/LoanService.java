@@ -32,6 +32,7 @@ public class LoanService {
   private final LoanMapper loanMapper;
   private final LoanStatusHistoryMapper loanStatusHistoryMapper;
   private final UserService userService;
+  private final DocumentService documentService;
 
   public List<LoanResponse> getAllLoan() {
     return loanMapper.toResponseList(loanRepository.findAll());
@@ -104,6 +105,9 @@ public class LoanService {
       throw new BusinessValidationException("Customer detail is not completed");
     }
 
+    // Get all doc for this loan
+    List<Document> documents = documentService.getDocumentEntitiesByCustomerDetail(customerDetail);
+
     // Create loan
     Loan loan =
         Loan.builder()
@@ -114,6 +118,7 @@ public class LoanService {
             .interestRate(req.getInterestRate())
             .installmentPayment(req.getInstallmentPayment())
             .status(LoanStatus.CREATED)
+            .documents(documents)
             .build();
     loan = loanRepository.save(loan);
 
@@ -226,4 +231,8 @@ public class LoanService {
     loanRepository.save(loan);
     return loanStatusHistoryRepository.save(loanStatusHistory);
   }
+
+    public LoanResponse getLoanById(UUID id) {
+      return loanMapper.toResponse(this.getLoanEntityById(id));
+    }
 }

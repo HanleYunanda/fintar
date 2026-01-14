@@ -2,7 +2,14 @@ package com.example.fintar.controller;
 
 import com.example.fintar.base.ApiResponse;
 import com.example.fintar.dto.*;
+import com.example.fintar.entity.CustomerDetail;
+import com.example.fintar.entity.Document;
+import com.example.fintar.entity.Loan;
+import com.example.fintar.entity.LoanStatusHistory;
 import com.example.fintar.enums.LoanStatus;
+import com.example.fintar.mapper.CustomerDetailMapper;
+import com.example.fintar.mapper.LoanMapper;
+import com.example.fintar.mapper.LoanStatusHistoryMapper;
 import com.example.fintar.service.LoanService;
 import com.example.fintar.util.ResponseUtil;
 import jakarta.validation.Valid;
@@ -19,11 +26,41 @@ import org.springframework.web.bind.annotation.*;
 public class LoanController {
 
   private final LoanService loanService;
+  private final LoanMapper loanMapper;
+  private final LoanStatusHistoryMapper loanStatusHistoryMapper;
+  private final CustomerDetailMapper customerDetailMapper;
 
   @GetMapping
   public ResponseEntity<ApiResponse<List<LoanResponse>>> index() {
     List<LoanResponse> loans = loanService.getAllLoan();
     return ResponseUtil.ok(loans, "Successfully get all loans");
+  }
+
+  @GetMapping("/{id}")
+  public ResponseEntity<ApiResponse<LoanDetailResponse>> show(
+          @PathVariable UUID id
+  ) {
+    Loan loan = loanService.getLoanEntityById(id);
+    List<LoanStatusHistory> loanStatusHistories = loan.getStatusHistories();
+    CustomerDetail customerDetail = loanService.getCustomerDetailEntityForLoan(loan);
+    List<Document> documents = loan.getDocuments();
+    LoanDetailResponse loanDetailResponse = LoanDetailResponse.builder()
+            .loan(loanMapper.toResponse(loan))
+            .loanStatusHistories(loanStatusHistoryMapper.toResponseList(loanStatusHistories))
+            .customerDetail(customerDetailMapper.toResponse(customerDetail))
+            .documents(
+                    documents.stream()
+                            .map(document -> DocumentResponse.builder()
+                                    .id(document.getId())
+                                    .filename(document.getFileName())
+                                    .fileUri(document.getFileUri())
+                                    .docType(document.getDocType())
+                                    .contentType(document.getContentType())
+                                    .build())
+                            .toList()
+            )
+            .build();
+    return ResponseUtil.ok(loanDetailResponse, "Successfully get loan detail");
   }
 
   @PostMapping

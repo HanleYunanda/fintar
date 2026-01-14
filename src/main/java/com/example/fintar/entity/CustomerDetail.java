@@ -59,6 +59,9 @@ public class CustomerDetail extends BaseEntity implements Serializable {
 
   private String accountNumber;
 
+  @ManyToOne
+  private Plafond plafond;
+
   @OneToMany(mappedBy = "customerDetail")
   private List<Document> documents;
 }

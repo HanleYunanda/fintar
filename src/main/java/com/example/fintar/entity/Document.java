@@ -6,6 +6,8 @@ import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
+import java.util.List;
+
 @Entity
 @Table(name = "documents")
 @Getter
@@ -24,13 +26,15 @@ public class Document extends BaseEntity {
   @Enumerated(EnumType.STRING)
   private DocType docType;
 
+  private Boolean isActive;
+
   @ManyToOne private CustomerDetail customerDetail;
 
-  //    @ManyToMany
-  //    @JoinTable(
-  //            name = "loan_documents",
-  //            joinColumns = @JoinColumn(name = "document_id"),
-  //            inverseJoinColumns = @JoinColumn(name = "loan_id")
-  //    )
-  //    private List<Loan> loans;
+  @ManyToMany
+  @JoinTable(
+          name = "loan_documents",
+          joinColumns = @JoinColumn(name = "document_id"),
+          inverseJoinColumns = @JoinColumn(name = "loan_id")
+  )
+  private List<Loan> loans;
 }

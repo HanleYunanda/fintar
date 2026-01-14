@@ -62,4 +62,9 @@ public class RoleService {
         .permissions(permissionMapper.toResponseSet(updatedRole.getPermissions()))
         .build();
   }
+
+    public RoleResponse getRoleById(UUID id) {
+      Role role = this.getRoleEntityById(id);
+      return roleMapper.toResponse(role);
+    }
 }

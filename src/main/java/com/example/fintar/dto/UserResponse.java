@@ -1,5 +1,7 @@
 package com.example.fintar.dto;
 
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Data;
@@ -10,4 +12,6 @@ public class UserResponse {
   private UUID id;
   private String username;
   private String email;
+  private List<RoleResponse> roles;
+//  private List<PermissionResponse> permissions;
 }

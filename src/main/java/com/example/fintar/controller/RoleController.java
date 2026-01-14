@@ -36,6 +36,14 @@ public class RoleController {
     return ResponseUtil.created(createdRole, "Successfully create new role");
   }
 
+  @GetMapping("/{id}")
+  public ResponseEntity<ApiResponse<RoleResponse>> show(
+          @PathVariable UUID id
+  ) {
+    RoleResponse role = roleService.getRoleById(id);
+    return ResponseUtil.ok(role, "Successfully create new role");
+  }
+
   @PostMapping("/{id}/assign-permissions")
   public ResponseEntity<ApiResponse<AssignPermissionResponse>> create(
       @RequestBody AssignPermissionRequest req, @PathVariable UUID id) {
