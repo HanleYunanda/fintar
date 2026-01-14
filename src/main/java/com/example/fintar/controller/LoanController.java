@@ -31,12 +31,14 @@ public class LoanController {
   private final CustomerDetailMapper customerDetailMapper;
 
   @GetMapping
+  @PreAuthorize("hasAuthority('READ_LOAN')")
   public ResponseEntity<ApiResponse<List<LoanResponse>>> index() {
     List<LoanResponse> loans = loanService.getAllLoan();
     return ResponseUtil.ok(loans, "Successfully get all loans");
   }
 
   @GetMapping("/{id}")
+  @PreAuthorize("hasAuthority('READ_LOAN')")
   public ResponseEntity<ApiResponse<LoanDetailResponse>> show(
           @PathVariable UUID id
   ) {

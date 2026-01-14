@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,12 +21,14 @@ public class CustomerDetailController {
   private final CustomerDetailService customerDetailService;
 
   @GetMapping
+  @PreAuthorize("hasAuthority('READ_CUSTOMER_DETAIL')")
   public ResponseEntity<ApiResponse<List<CustomerDetailResponse>>> index() {
     List<CustomerDetailResponse> customerDetails = customerDetailService.getAllCustomerDetail();
     return ResponseUtil.ok(customerDetails, "Successfully get all customer details");
   }
 
   @PostMapping
+  @PreAuthorize("hasAuthority('CREATE_CUSTOMER_DETAIL')")
   public ResponseEntity<ApiResponse<CustomerDetailResponse>> create(
       @RequestBody @Valid CustomerDetailRequest req) {
     CustomerDetailResponse createdCustomerDetail = customerDetailService.createCustomerDetail(req);
@@ -33,6 +36,7 @@ public class CustomerDetailController {
   }
 
   @PatchMapping("/{id}")
+  @PreAuthorize("hasAuthority('UPDATE_CUSTOMER_DETAIL')")
   public ResponseEntity<ApiResponse<CustomerDetailResponse>> update(
       @RequestBody @Valid CustomerDetailRequest req, @PathVariable UUID id) {
     CustomerDetailResponse updatedCustomerDetail =

@@ -14,19 +14,20 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/product")
-@PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
 public class ProductController {
 
   private final ProductService productService;
 
   @GetMapping
+  @PreAuthorize("hasAuthority('READ_PRODUCT')")
   public ResponseEntity<ApiResponse<List<ProductResponse>>> index() {
     List<ProductResponse> products = productService.getAllProduct();
     return ResponseUtil.ok(products, "Successfully get all products");
   }
 
   @PostMapping
+  @PreAuthorize("hasAuthority('CREATE_PRODUCT')")
   public ResponseEntity<ApiResponse<ProductResponse>> create(
       @RequestBody @Valid ProductRequest req) {
     ProductResponse createdProduct = productService.createProduct(req);

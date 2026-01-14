@@ -15,6 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.MediaTypeFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,6 +32,7 @@ public class DocumentController {
   private final CustomerDetailService customerDetailService;
 
   @PostMapping("/{type}")
+  @PreAuthorize("hasAuthority('UPLOAD_DOCUMENT')")
   public ResponseEntity<ApiResponse<DocumentResponse>> uploadLoanDoc(
       @PathVariable String type, @RequestParam("file") MultipartFile file) {
     DocType docType;

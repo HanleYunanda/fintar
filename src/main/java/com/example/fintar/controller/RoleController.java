@@ -19,24 +19,26 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/role")
-@PreAuthorize("hasRole('ADMIN')")
 public class RoleController {
 
   private final RoleService roleService;
 
   @GetMapping
+  @PreAuthorize("hasAuthority('READ_ROLE')")
   public ResponseEntity<ApiResponse<List<RoleResponse>>> index() {
     List<RoleResponse> roles = roleService.getAllRole();
     return ResponseUtil.ok(roles, "Successfully get all roles");
   }
 
   @PostMapping
+  @PreAuthorize("hasAuthority('CREATE_ROLE')")
   public ResponseEntity<ApiResponse<RoleResponse>> create(@RequestBody @Valid RoleRequest req) {
     RoleResponse createdRole = roleService.createRole(req);
     return ResponseUtil.created(createdRole, "Successfully create new role");
   }
 
   @GetMapping("/{id}")
+  @PreAuthorize("hasAuthority('READ_ROLE')")
   public ResponseEntity<ApiResponse<RoleResponse>> show(
           @PathVariable UUID id
   ) {
@@ -45,6 +47,7 @@ public class RoleController {
   }
 
   @PostMapping("/{id}/assign-permissions")
+  @PreAuthorize("hasAuthority('ASSIGN_PERMISSION')")
   public ResponseEntity<ApiResponse<AssignPermissionResponse>> create(
       @RequestBody AssignPermissionRequest req, @PathVariable UUID id) {
     // Get Role

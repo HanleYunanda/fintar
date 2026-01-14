@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "users")
@@ -12,6 +14,8 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@SQLDelete(sql = "UPDATE users SET is_deleted = 1 WHERE id = ?")
+@SQLRestriction("is_deleted = 0")
 public class User extends BaseEntity {
 
   @Column(nullable = false, unique = true)

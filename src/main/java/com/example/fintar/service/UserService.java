@@ -2,6 +2,7 @@ package com.example.fintar.service;
 
 import com.example.fintar.dto.UserRequest;
 import com.example.fintar.dto.UserResponse;
+import com.example.fintar.dto.UserUpdateRequest;
 import com.example.fintar.entity.Role;
 import com.example.fintar.entity.User;
 import com.example.fintar.exception.ResourceNotFoundException;
@@ -31,7 +32,7 @@ public class UserService {
 
     // Ambil roles dari DB
     Set<Role> roles = roleService.getRolesEntityByName(req.getRoles());
-    if (roles.isEmpty()) throw new ResourceNotFoundException("Create base roles first");
+    if (roles.isEmpty()) throw new ResourceNotFoundException("Role not found");
 
     User user =
         User.builder()
@@ -56,11 +57,17 @@ public class UserService {
     return userMapper.toResponse(this.getUserEntity(id));
   }
 
-  public UserResponse updateUser(UUID id, UserRequest userRequest) {
+  public UserResponse updateUser(UUID id, UserUpdateRequest userRequest) {
     User user = this.getUserEntity(id);
     user.setEmail(userRequest.getEmail());
     user.setUsername(userRequest.getUsername());
     user.setPassword(user.getPassword());
+
+    // Ambil roles dari DB
+    Set<Role> roles = roleService.getRolesEntityByName(userRequest.getRoles());
+    if (roles.isEmpty()) throw new ResourceNotFoundException("Role not found");
+    user.setRoles(roles);
+
     return userMapper.toResponse(userRepository.save(user));
   }
 

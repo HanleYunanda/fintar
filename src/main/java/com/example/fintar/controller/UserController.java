@@ -3,6 +3,7 @@ package com.example.fintar.controller;
 import com.example.fintar.base.ApiResponse;
 import com.example.fintar.dto.UserRequest;
 import com.example.fintar.dto.UserResponse;
+import com.example.fintar.dto.UserUpdateRequest;
 import com.example.fintar.entity.User;
 import com.example.fintar.service.UserService;
 import com.example.fintar.util.ResponseUtil;
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user")
-@PreAuthorize("hasRole('ADMIN')")
 public class UserController {
 
   private final UserService userService;
@@ -46,7 +46,7 @@ public class UserController {
   @PutMapping("/{id}")
   @PreAuthorize("hasAuthority('UPDATE_USER')")
   public ResponseEntity<ApiResponse<UserResponse>> update(
-      @PathVariable UUID id, @RequestBody @Valid UserRequest req) {
+      @PathVariable UUID id, @RequestBody @Valid UserUpdateRequest req) {
     UserResponse user = userService.updateUser(id, req);
     return ResponseUtil.ok(user, "Successfully update user");
   }

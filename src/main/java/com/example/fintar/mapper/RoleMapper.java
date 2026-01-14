@@ -18,7 +18,7 @@ public class RoleMapper {
   private final PermissionMapper permissionMapper;
 
   public RoleResponse toResponse(Role role) {
-    return RoleResponse.builder().id(role.getId()).name(role.getName()).permissions(permissionMapper.toResponseSet(role.getPermissions())).build();
+    return RoleResponse.builder().id(role.getId()).name(role.getName()).permissions(role.getPermissions() == null ? null : permissionMapper.toResponseSet(role.getPermissions())).build();
   }
 
   public List<RoleResponse> toResponseList(List<Role> roles) {

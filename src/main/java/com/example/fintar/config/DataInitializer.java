@@ -36,6 +36,7 @@ public class DataInitializer implements CommandLineRunner {
               Permission.builder().code("READ_ROLE").build(),
               Permission.builder().code("UPDATE_ROLE").build(),
               Permission.builder().code("DELETE_ROLE").build(),
+              Permission.builder().code("ASSIGN_PERMISSION").build(),
               Permission.builder().code("CREATE_PERMISSION").build(),
               Permission.builder().code("READ_PERMISSION").build(),
               Permission.builder().code("DELETE_PERMISSION").build(),
