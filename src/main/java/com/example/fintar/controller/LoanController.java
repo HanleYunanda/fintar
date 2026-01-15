@@ -99,4 +99,5 @@ public class LoanController {
     LoanStatusHistoryResponse isDisbursed = loanService.disburseLoanApplication(id, req);
     return ResponseUtil.ok(isDisbursed, "Successfully disbursed loan application");
   }
+
 }

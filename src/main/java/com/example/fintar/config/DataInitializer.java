@@ -51,6 +51,14 @@ public class DataInitializer implements CommandLineRunner {
               Permission.builder().code("READ_PRODUCT").build());
       permissions = permissionRepository.saveAll(permissions);
 
+      permissionRepository.saveAll(Arrays.asList(
+              Permission.builder().code("READ_LOAN").build(),
+              Permission.builder().code("CREATE_LOAN").build(),
+              Permission.builder().code("REVIEW_LOAN").build(),
+              Permission.builder().code("APPROVE_LOAN").build(),
+              Permission.builder().code("REJECT_LOAN").build()
+      ));
+
       if (roleRepository.count() == 0) {
         Role customer = Role.builder().name("CUSTOMER").build();
         Role marketing = Role.builder().name("MARKETING").build();

@@ -33,6 +33,7 @@ public class LoanService {
   private final LoanStatusHistoryMapper loanStatusHistoryMapper;
   private final UserService userService;
   private final DocumentService documentService;
+  private final CustomerDetailService customerDetailService;
 
   public List<LoanResponse> getAllLoan() {
     return loanMapper.toResponseList(loanRepository.findAll());
@@ -193,8 +194,8 @@ public class LoanService {
   }
 
   public LoanStatusHistoryResponse disburseLoanApplication(UUID id, ChangeLoanStatusRequest req) {
-    // Check : action must be DISBURESED
-    if (req.getAction() != LoanStatus.DISBURESED)
+    // Check : action must be DISBURSED
+    if (req.getAction() != LoanStatus.DISBURSED)
       throw new BusinessValidationException("Wrong action input");
 
     // Get loan

@@ -24,6 +24,7 @@ public class LoanMapper {
         .interestRate(loan.getInterestRate())
         .installmentPayment(loan.getInstallmentPayment())
         .status(loan.getStatus())
+        .createdAt(loan.getCreatedAt())
         .loanStatusHistories(loanStatusHistoryMapper.toResponseList(loan.getStatusHistories()))
         .build();
   }

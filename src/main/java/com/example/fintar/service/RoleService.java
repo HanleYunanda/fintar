@@ -29,13 +29,11 @@ public class RoleService {
   private final RoleMapper roleMapper;
   private final PermissionMapper permissionMapper;
 
-  @Cacheable(value = "roles")
   public List<RoleResponse> getAllRole() {
     return roleMapper.toResponseList(roleRepository.findAll());
   }
 
   @Transactional
-  @CacheEvict(value = "roles", allEntries = true)
   public RoleResponse createRole(RoleRequest req) {
     Role role = roleMapper.fromRequest(req);
     return roleMapper.toResponse(roleRepository.save(role));
