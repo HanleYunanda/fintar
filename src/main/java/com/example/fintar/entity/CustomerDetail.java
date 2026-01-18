@@ -62,6 +62,8 @@ public class CustomerDetail extends BaseEntity implements Serializable {
   @ManyToOne
   private Plafond plafond;
 
+  private Double remainPlafond;
+
   @OneToMany(mappedBy = "customerDetail")
   private List<Document> documents;
 }

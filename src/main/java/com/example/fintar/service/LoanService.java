@@ -33,6 +33,7 @@ public class LoanService {
   private final LoanStatusHistoryMapper loanStatusHistoryMapper;
   private final UserService userService;
   private final DocumentService documentService;
+  private final CustomerDetailService customerDetailService;
 
   public List<LoanResponse> getAllLoan() {
     return loanMapper.toResponseList(loanRepository.findAll());
@@ -104,6 +105,9 @@ public class LoanService {
       throw new BusinessValidationException("Customer detail is not completed");
     }
 
+    // Check if customer's plafond still remain
+    if(customerDetail.getRemainPlafond() < req.getPrincipalDebt()) throw new BusinessValidationException("Your plafond is insufficient");
+
     // Get all doc for this loan
     List<Document> documents = documentService.getDocumentEntitiesByCustomerDetail(customerDetail);
 
@@ -131,6 +135,10 @@ public class LoanService {
 
     loan.setStatusHistories(this.getLoanStatusHistoriesEntityByLoan(loan.getId()));
     // loan = this.getLoanEntityById(loan.getId());
+
+    // Substract remain plafond
+    customerDetailService.substractRemainPlafond(customerDetail, loan.getPrincipalDebt());
+
     return loanMapper.toResponse(loan);
   }
 

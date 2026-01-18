@@ -4,6 +4,7 @@ import com.example.fintar.dto.CustomerDetailRequest;
 import com.example.fintar.dto.CustomerDetailResponse;
 import com.example.fintar.entity.CustomerDetail;
 import com.example.fintar.entity.Document;
+import com.example.fintar.entity.Plafond;
 import com.example.fintar.entity.User;
 import com.example.fintar.exception.BusinessValidationException;
 import com.example.fintar.exception.ResourceNotFoundException;
@@ -44,7 +45,9 @@ public class CustomerDetailService {
     customerDetail.setUser(user);
 
     // Set basic plafond to new user
-    customerDetail.setPlafond(plafondService.getPlafondEntityByName("IRON"));
+    Plafond basicPlafond = plafondService.getPlafondEntityByName("IRON");
+    customerDetail.setPlafond(basicPlafond);
+    customerDetail.setRemainPlafond(basicPlafond.getMaxAmount());
 
     return customerDetailMapper.toResponse(customerDetailRepository.save(customerDetail));
   }
@@ -107,5 +110,10 @@ public class CustomerDetailService {
     CustomerDetail customerDetail = user.getCustomerDetail();
     if (customerDetail == null) throw new ResourceNotFoundException("Customer detail not found");
     return customerDetail;
+  }
+
+  public CustomerDetail substractRemainPlafond(CustomerDetail customerDetail, Long principalDebt) {
+    customerDetail.setRemainPlafond(customerDetail.getRemainPlafond() - principalDebt);
+    return customerDetailRepository.save(customerDetail);
   }
 }
