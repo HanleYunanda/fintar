@@ -1,6 +1,7 @@
 package com.example.fintar.controller;
 
 import com.example.fintar.base.ApiResponse;
+import com.example.fintar.dto.ChangePasswordRequest;
 import com.example.fintar.dto.UserRequest;
 import com.example.fintar.dto.UserResponse;
 import com.example.fintar.dto.UserUpdateRequest;
@@ -51,9 +52,19 @@ public class UserController {
     return ResponseUtil.ok(user, "Successfully update user");
   }
 
+  @PatchMapping("/{id}/changePassword")
+  @PreAuthorize("hasAuthority('CHANGE_PASSWORD')")
+  public ResponseEntity<ApiResponse<UserResponse>> changePassword(
+          @PathVariable UUID id,
+          @RequestBody @Valid ChangePasswordRequest req
+  ) {
+    UserResponse userResponse =userService.updatePassword(id, req);
+    return ResponseUtil.ok(userResponse, "Successfully delete user");
+  }
+
   @DeleteMapping("/{id}")
   @PreAuthorize("hasAuthority('DELETE_USER')")
-  public ResponseEntity<ApiResponse<User>> delete(@PathVariable UUID id) {
+  public ResponseEntity<ApiResponse<UserResponse>> delete(@PathVariable UUID id) {
     userService.deleteUser(id);
     return ResponseUtil.ok(null, "Successfully delete user");
   }

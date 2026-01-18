@@ -33,7 +33,6 @@ public class LoanService {
   private final LoanStatusHistoryMapper loanStatusHistoryMapper;
   private final UserService userService;
   private final DocumentService documentService;
-  private final CustomerDetailService customerDetailService;
 
   public List<LoanResponse> getAllLoan() {
     return loanMapper.toResponseList(loanRepository.findAll());
@@ -56,14 +55,13 @@ public class LoanService {
       throw new BusinessValidationException("Tenor exceeding the permitted limit");
 
     // Check simulation result
-    Long interestAmount =
-        Math.round(req.getPrincipalDebt() * (req.getInterestRate() / 100) * req.getTenor());
-    //        System.out.println(interestAmount);
+    Long interestAmount = Math.round(req.getPrincipalDebt() * (req.getInterestRate() / 100) * req.getTenor());
+    // System.out.println(interestAmount);
     Long outstandingDebt = req.getPrincipalDebt() + interestAmount;
-    //        System.out.println(outstandingDebt);
+    // System.out.println(outstandingDebt);
     Long installmentPayment = outstandingDebt / req.getTenor();
-    //        System.out.println(outstandingDebt / req.getTenor());
-    //        System.out.println(installmentPayment);
+    // System.out.println(outstandingDebt / req.getTenor());
+    // System.out.println(installmentPayment);
     if (!outstandingDebt.equals(req.getOutstandingDebt()))
       throw new BusinessValidationException("Incorrect calculation of outstanding debt");
     if (!installmentPayment.equals(req.getInstallmentPayment()))
@@ -110,37 +108,36 @@ public class LoanService {
     List<Document> documents = documentService.getDocumentEntitiesByCustomerDetail(customerDetail);
 
     // Create loan
-    Loan loan =
-        Loan.builder()
-            .product(product)
-            .principalDebt(req.getPrincipalDebt())
-            .outstandingDebt(req.getOutstandingDebt())
-            .tenor(req.getTenor())
-            .interestRate(req.getInterestRate())
-            .installmentPayment(req.getInstallmentPayment())
-            .status(LoanStatus.CREATED)
-            .documents(documents)
-            .build();
+    Loan loan = Loan.builder()
+        .product(product)
+        .principalDebt(req.getPrincipalDebt())
+        .outstandingDebt(req.getOutstandingDebt())
+        .tenor(req.getTenor())
+        .interestRate(req.getInterestRate())
+        .installmentPayment(req.getInstallmentPayment())
+        .status(LoanStatus.CREATED)
+        .documents(documents)
+        .build();
     loan = loanRepository.save(loan);
 
     // Create loan status history
-    LoanStatusHistory loanStatusHistory =
-        LoanStatusHistory.builder()
-            .loan(loan)
-            .action(LoanStatus.CREATED)
-            .performedBy(userPrincipal.getUser())
-            .performedAt(LocalDateTime.now())
-            .build();
+    LoanStatusHistory loanStatusHistory = LoanStatusHistory.builder()
+        .loan(loan)
+        .action(LoanStatus.CREATED)
+        .performedBy(userPrincipal.getUser())
+        .performedAt(LocalDateTime.now())
+        .build();
     loanStatusHistory = loanStatusHistoryRepository.save(loanStatusHistory);
 
     loan.setStatusHistories(this.getLoanStatusHistoriesEntityByLoan(loan.getId()));
-    //        loan = this.getLoanEntityById(loan.getId());
+    // loan = this.getLoanEntityById(loan.getId());
     return loanMapper.toResponse(loan);
   }
 
   public Loan getLoanEntityById(UUID id) {
     Optional<Loan> loan = loanRepository.findById(id);
-    if (loan.isEmpty()) throw new ResourceNotFoundException("Loan with id " + id + " not found");
+    if (loan.isEmpty())
+      throw new ResourceNotFoundException("Loan with id " + id + " not found");
     return loan.get();
   }
 
@@ -181,11 +178,12 @@ public class LoanService {
     Loan loan = this.getLoanEntityById(id);
 
     // Check : loan must be reviewed first
-    //        Optional<LoanStatusHistory> isReviewed =
+    // Optional<LoanStatusHistory> isReviewed =
     // loanStatusHistoryRepository.findFirstByLoanOrderByPerformedAtDesc(loan);
-    //        if(isReviewed.isEmpty()) throw new BusinessValidationException("Loan application has
+    // if(isReviewed.isEmpty()) throw new BusinessValidationException("Loan
+    // application has
     // not been reviewed");
-    //        if(isReviewed.get().getAction() != LoanStatus.REVIEWED) throw new
+    // if(isReviewed.get().getAction() != LoanStatus.REVIEWED) throw new
     // BusinessValidationException("Loan application has not been reviewed");
     if (loan.getStatus() != LoanStatus.REVIEWED)
       throw new BusinessValidationException("Loan application has not been reviewed");
@@ -204,11 +202,12 @@ public class LoanService {
     // Check : loan must be approved first
     if (loan.getStatus() != LoanStatus.APPROVED)
       throw new BusinessValidationException("Loan application has not been approved");
-    //        Optional<LoanStatusHistory> isApproved =
+    // Optional<LoanStatusHistory> isApproved =
     // loanStatusHistoryRepository.findFirstByLoanOrderByPerformedAtDesc(loan);
-    //        if(isApproved.isEmpty()) throw new BusinessValidationException("Loan application has
+    // if(isApproved.isEmpty()) throw new BusinessValidationException("Loan
+    // application has
     // not been approved");
-    //        if(isApproved.get().getAction() != LoanStatus.APPROVED) throw new
+    // if(isApproved.get().getAction() != LoanStatus.APPROVED) throw new
     // BusinessValidationException("Loan application has not been approved");
 
     return loanStatusHistoryMapper.toResponse(this.changeStatusApproval(loan, req));
@@ -220,20 +219,19 @@ public class LoanService {
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
 
     // Create new status history
-    LoanStatusHistory loanStatusHistory =
-        LoanStatusHistory.builder()
-            .loan(loan)
-            .action(req.getAction())
-            .note(req.getNote())
-            .performedBy(userPrincipal.getUser())
-            .performedAt(LocalDateTime.now())
-            .build();
+    LoanStatusHistory loanStatusHistory = LoanStatusHistory.builder()
+        .loan(loan)
+        .action(req.getAction())
+        .note(req.getNote())
+        .performedBy(userPrincipal.getUser())
+        .performedAt(LocalDateTime.now())
+        .build();
     loan.setStatus(req.getAction());
     loanRepository.save(loan);
     return loanStatusHistoryRepository.save(loanStatusHistory);
   }
 
-    public LoanResponse getLoanById(UUID id) {
-      return loanMapper.toResponse(this.getLoanEntityById(id));
-    }
+  public LoanResponse getLoanById(UUID id) {
+    return loanMapper.toResponse(this.getLoanEntityById(id));
+  }
 }

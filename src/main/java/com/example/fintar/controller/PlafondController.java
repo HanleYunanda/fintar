@@ -22,7 +22,7 @@ public class PlafondController {
   private final PlafondService plafondService;
 
   @GetMapping
-  @PreAuthorize("hasAuthority('READ_PLAFOND')")
+//  @PreAuthorize("hasAuthority('READ_PLAFOND')")
   public ResponseEntity<ApiResponse<List<PlafondResponse>>> index() {
     List<PlafondResponse> plafonds = plafondService.getAllPlafond();
     return ResponseUtil.ok(plafonds, "Successfully get all plafonds");

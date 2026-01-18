@@ -106,7 +106,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler(AuthorizationDeniedException.class)
   public ResponseEntity<ApiResponse<Object>> handleAuthorizationDeniedException(
       AuthorizationDeniedException ex) {
-    return ResponseUtil.error(HttpStatus.UNAUTHORIZED, ex.getMessage());
+    return ResponseUtil.error(HttpStatus.FORBIDDEN, ex.getMessage());
   }
 
   @ExceptionHandler(DisabledException.class)

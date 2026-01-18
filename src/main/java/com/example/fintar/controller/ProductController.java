@@ -20,7 +20,7 @@ public class ProductController {
   private final ProductService productService;
 
   @GetMapping
-  @PreAuthorize("hasAuthority('READ_PRODUCT')")
+//  @PreAuthorize("hasAuthority('READ_PRODUCT')")
   public ResponseEntity<ApiResponse<List<ProductResponse>>> index() {
     List<ProductResponse> products = productService.getAllProduct();
     return ResponseUtil.ok(products, "Successfully get all products");

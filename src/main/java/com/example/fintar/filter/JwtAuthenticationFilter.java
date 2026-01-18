@@ -32,7 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private final CustomUserDetailsService userDetailsService;
   private final JwtBlacklistService jwtBlacklistService;
 
-  private static final List<String> WHITELIST = List.of("/auth/login", "/auth/register");
+  private static final List<String> WHITELIST = List.of("/auth/login", "/auth/register", "/plafond", "/product");
 
   @Override
   protected void doFilterInternal(

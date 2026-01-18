@@ -1,15 +1,22 @@
 package com.example.fintar.service;
 
+import com.example.fintar.dto.ChangePasswordRequest;
 import com.example.fintar.dto.UserRequest;
 import com.example.fintar.dto.UserResponse;
 import com.example.fintar.dto.UserUpdateRequest;
 import com.example.fintar.entity.Role;
 import com.example.fintar.entity.User;
+import com.example.fintar.entity.UserPrincipal;
+import com.example.fintar.exception.BusinessValidationException;
 import com.example.fintar.exception.ResourceNotFoundException;
 import com.example.fintar.mapper.UserMapper;
 import com.example.fintar.repository.UserRepository;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,6 +26,7 @@ public class UserService {
   private final UserRepository userRepository;
   private final RoleService roleService;
   private final UserMapper userMapper;
+  private final PasswordEncoder passwordEncoder;
 
   public List<UserResponse> getAllUser() {
     return userMapper.toResponseList(userRepository.findAll());
@@ -38,7 +46,7 @@ public class UserService {
         User.builder()
             .username(req.getUsername())
             .email(req.getEmail())
-            .password(req.getPassword())
+            .password(passwordEncoder.encode(req.getPassword()))
             .isActive(true)
             .roles(roles)
             .build();
@@ -61,7 +69,6 @@ public class UserService {
     User user = this.getUserEntity(id);
     user.setEmail(userRequest.getEmail());
     user.setUsername(userRequest.getUsername());
-    user.setPassword(user.getPassword());
 
     // Ambil roles dari DB
     Set<Role> roles = roleService.getRolesEntityByName(userRequest.getRoles());
@@ -75,4 +82,26 @@ public class UserService {
     User user = this.getUserEntity(id);
     userRepository.delete(user);
   }
+
+    public UserResponse updatePassword(UUID id, ChangePasswordRequest request) {
+
+      User user = this.getUserEntity(id);
+
+      Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+      UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
+
+      // Check if user belong to logged in user
+      System.out.println("TEST");
+      System.out.println(userPrincipal.getUser().getId());
+      System.out.println(id);
+      System.out.println(userPrincipal.getUser().getId() != user.getId());
+      if(!Objects.equals(userPrincipal.getUser().getId(), user.getId())) throw new BusinessValidationException("Cannot change other user password");
+
+      // Check if old password valid
+      if(!Objects.equals(user.getPassword(), passwordEncoder.encode(request.getOldPassword()))) throw new BusinessValidationException("Old Password Invalid");
+
+      user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+      return userMapper.toResponse(userRepository.save(user));
+
+    }
 }
