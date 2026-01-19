@@ -36,26 +36,47 @@ public interface LoanRepository extends JpaRepository<Loan, UUID> {
     Long countApprovedApplicationsBetween(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
     @Query("""
-    SELECT new com.example.fintar.dto.DisbursementTrendDTO(
-        FUNCTION('YEAR', l.createdAt),
-        FUNCTION('MONTH', l.createdAt),
-        SUM(l.principalDebt)
-    )
-    FROM Loan l
-    WHERE l.createdAt >= :startDate
-    AND l.status = 'DISBURSED'
-    AND l.createdAt <= :endDate
-    GROUP BY
-        FUNCTION('YEAR', l.createdAt),
-        FUNCTION('MONTH', l.createdAt)
-    ORDER BY
-        FUNCTION('YEAR', l.createdAt),
-        FUNCTION('MONTH', l.createdAt)
-    """)
+            SELECT new com.example.fintar.dto.DisbursementTrendDTO(
+                FUNCTION('YEAR', l.createdAt),
+                FUNCTION('MONTH', l.createdAt),
+                SUM(l.principalDebt)
+            )
+            FROM Loan l
+            WHERE l.createdAt >= :startDate
+            AND l.status = 'DISBURSED'
+            AND l.createdAt <= :endDate
+            GROUP BY
+                FUNCTION('YEAR', l.createdAt),
+                FUNCTION('MONTH', l.createdAt)
+            ORDER BY
+                FUNCTION('YEAR', l.createdAt),
+                FUNCTION('MONTH', l.createdAt)
+            """)
     List<DisbursementTrendDTO> findDisbursementTrendsAfter(
             @Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate
-    );
+            @Param("endDate") LocalDateTime endDate);
 
+    @Query("""
+            SELECT new com.example.fintar.dto.ApplicationStatusDTO(
+                CAST(l.status AS string),
+                COUNT(l)
+            )
+            FROM Loan l
+            GROUP BY l.status
+            """)
+    List<com.example.fintar.dto.ApplicationStatusDTO> countApplicationsByStatus();
+
+    @Query("""
+            SELECT new com.example.fintar.dto.BestSellingProductDTO(
+                CONCAT(p.plafond.name, ' ', p.tenor),
+                COUNT(l)
+            )
+            FROM Loan l
+            JOIN l.product p
+            GROUP BY p.plafond.name, p.tenor
+            ORDER BY COUNT(l) DESC
+            LIMIT :limit
+            """)
+    List<com.example.fintar.dto.BestSellingProductDTO> findBestSellingProducts(@Param("limit") Integer limit);
 
 }

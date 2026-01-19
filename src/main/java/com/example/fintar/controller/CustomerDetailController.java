@@ -3,7 +3,9 @@ package com.example.fintar.controller;
 import com.example.fintar.base.ApiResponse;
 import com.example.fintar.dto.CustomerDetailRequest;
 import com.example.fintar.dto.CustomerDetailResponse;
+import com.example.fintar.entity.User;
 import com.example.fintar.service.CustomerDetailService;
+import com.example.fintar.service.UserService;
 import com.example.fintar.util.ResponseUtil;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class CustomerDetailController {
 
   private final CustomerDetailService customerDetailService;
+  private final UserService userService;
 
   @GetMapping
   @PreAuthorize("hasAuthority('READ_CUSTOMER_DETAIL')")
@@ -43,4 +46,21 @@ public class CustomerDetailController {
         customerDetailService.updateCustomerDetail(id, req);
     return ResponseUtil.ok(updatedCustomerDetail, "Successfully update customer detail");
   }
+
+  @GetMapping("/{id}")
+  public ResponseEntity<ApiResponse<CustomerDetailResponse>> show(
+          @PathVariable UUID id
+  ) {
+    CustomerDetailResponse customerDetailResponse = customerDetailService.getCustomerDetailById(id);
+    return ResponseUtil.ok(customerDetailResponse, "Successfully get customer detail");
+  }
+
+  @GetMapping("/user/{userId}")
+  public ResponseEntity<ApiResponse<CustomerDetailResponse>> getUserCustomerDetail(
+          @PathVariable UUID userId
+  ) {
+    CustomerDetailResponse customerDetailResponse = customerDetailService.getCustomerDetailByUserId(userId);
+    return ResponseUtil.ok(customerDetailResponse, "Successfully get customer detail");
+  }
+
 }

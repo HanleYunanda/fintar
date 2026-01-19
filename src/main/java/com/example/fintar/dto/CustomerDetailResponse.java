@@ -7,6 +7,8 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Data;
@@ -41,4 +43,9 @@ public class CustomerDetailResponse {
   private String workplace;
   private Double salary;
   private String accountNumber;
+
+  private PlafondResponse plafond;
+  private Double remainPlafond;
+  @Builder.Default
+  private List<DocumentResponse> documentResponses = new ArrayList<>();
 }

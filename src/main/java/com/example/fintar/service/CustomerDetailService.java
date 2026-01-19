@@ -9,6 +9,7 @@ import com.example.fintar.entity.User;
 import com.example.fintar.exception.BusinessValidationException;
 import com.example.fintar.exception.ResourceNotFoundException;
 import com.example.fintar.mapper.CustomerDetailMapper;
+import com.example.fintar.mapper.PlafondMapper;
 import com.example.fintar.repository.CustomerDetailRepository;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +26,7 @@ public class CustomerDetailService {
   private final UserService userService;
   private final AuthService authService;
   private final PlafondService plafondService;
+  private final PlafondMapper plafondMapper;
 
   public List<CustomerDetailResponse> getAllCustomerDetail() {
     List<CustomerDetail> customerDetails = customerDetailRepository.findAll();
@@ -103,6 +105,25 @@ public class CustomerDetailService {
     Optional<CustomerDetail> customerDetail = customerDetailRepository.findById(id);
     if (customerDetail.isEmpty()) throw new ResourceNotFoundException("Customer detail not found");
     return customerDetail.get();
+  }
+
+  public CustomerDetailResponse getCustomerDetailById(UUID id) {
+    CustomerDetail customerDetail = this.getCustomerDetailEntityById(id);
+    CustomerDetailResponse customerDetailResponse = customerDetailMapper.toResponse(customerDetail);
+    if(customerDetail.getPlafond() == null) throw new BusinessValidationException("Plafond is not set for this customer");
+    customerDetailResponse.setPlafond(plafondMapper.toResponse(customerDetail.getPlafond()));
+//    customerDetailResponse.setDocumentResponses();
+    return customerDetailResponse;
+  }
+
+  public CustomerDetailResponse getCustomerDetailByUserId(UUID userId) {
+    User user = userService.getUserEntity(userId);
+    if(user.getCustomerDetail() == null) throw new BusinessValidationException("Customer detail has not been created");
+    CustomerDetail customerDetail = user.getCustomerDetail();
+    CustomerDetailResponse customerDetailResponse = customerDetailMapper.toResponse(customerDetail);
+    customerDetailResponse.setPlafond(plafondMapper.toResponse(customerDetail.getPlafond()));
+    customerDetailResponse.setRemainPlafond(customerDetail.getRemainPlafond());
+    return customerDetailResponse;
   }
 
   public CustomerDetail getCustomerDetailEntityByLoggedInUser() {

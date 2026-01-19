@@ -1,5 +1,7 @@
 package com.example.fintar.service;
 
+import com.example.fintar.dto.ApplicationStatusDTO;
+import com.example.fintar.dto.BestSellingProductDTO;
 import com.example.fintar.dto.DashboardSummaryDTO;
 import com.example.fintar.dto.DisbursementTrendDTO;
 import com.example.fintar.repository.LoanRepository;
@@ -83,5 +85,13 @@ public class ReportService {
             return current > 0 ? 100.0 : 0.0;
         }
         return ((double) (current - previous) / previous) * 100;
+    }
+
+    public List<ApplicationStatusDTO> getApplicationsByStatus() {
+        return loanRepository.countApplicationsByStatus();
+    }
+
+    public List<BestSellingProductDTO> getBestSellingProducts(Integer limit) {
+        return loanRepository.findBestSellingProducts(limit);
     }
 }
