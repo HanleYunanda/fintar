@@ -83,6 +83,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   @Override
   protected boolean shouldNotFilter(HttpServletRequest request) {
     String path = request.getServletPath();
-    return WHITELIST.stream().anyMatch(path::startsWith);
+    return WHITELIST.stream().anyMatch(path::matches);
   }
 }

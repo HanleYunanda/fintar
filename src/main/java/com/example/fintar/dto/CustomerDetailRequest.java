@@ -6,6 +6,8 @@ import com.example.fintar.enums.Religion;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.*;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.Data;
@@ -29,7 +31,7 @@ public class CustomerDetailRequest {
   private String placeOfBirth;
 
   @Past(message = "Date of birth must be in the past")
-  private LocalDateTime dateOfBirth;
+  private LocalDate dateOfBirth;
 
   @NotNull(message = "Gender is required")
   private Boolean isMale;

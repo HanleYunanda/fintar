@@ -47,4 +47,8 @@ public class ProductService {
       throw new ResourceNotFoundException("Product with id " + id + " not found");
     return product.get();
   }
+
+    public List<ProductResponse> getAllProductByPlafond(Plafond plafond) {
+      return productMapper.toResponseList(productRepository.findAllByPlafond(plafond));
+    }
 }

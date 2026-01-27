@@ -2,6 +2,7 @@ package com.example.fintar.service;
 
 import com.example.fintar.dto.CustomerDetailRequest;
 import com.example.fintar.dto.CustomerDetailResponse;
+import com.example.fintar.dto.DocumentResponse;
 import com.example.fintar.entity.CustomerDetail;
 import com.example.fintar.entity.Document;
 import com.example.fintar.entity.Plafond;
@@ -112,7 +113,20 @@ public class CustomerDetailService {
     CustomerDetailResponse customerDetailResponse = customerDetailMapper.toResponse(customerDetail);
     if(customerDetail.getPlafond() == null) throw new BusinessValidationException("Plafond is not set for this customer");
     customerDetailResponse.setPlafond(plafondMapper.toResponse(customerDetail.getPlafond()));
-//    customerDetailResponse.setDocumentResponses();
+    customerDetailResponse.setDocuments(
+            customerDetail.getDocuments()
+                    .stream()
+                    .map(document ->
+                            DocumentResponse.builder()
+                                    .id(document.getId())
+                                    .filename(document.getFileName())
+                                    .fileUri(document.getFileUri())
+                                    .contentType(document.getContentType())
+                                    .size(document.getSize())
+                                    .docType(document.getDocType())
+                                    .build()
+                    ).toList()
+    );
     return customerDetailResponse;
   }
 

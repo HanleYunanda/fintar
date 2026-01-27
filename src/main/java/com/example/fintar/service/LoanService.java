@@ -34,6 +34,7 @@ public class LoanService {
   private final UserService userService;
   private final DocumentService documentService;
   private final CustomerDetailService customerDetailService;
+  private final NotificationService notificationService;
 
   public List<LoanResponse> getAllLoan() {
     return loanMapper.toResponseList(loanRepository.findAll());
@@ -106,7 +107,8 @@ public class LoanService {
     }
 
     // Check if customer's plafond still remain
-    if(customerDetail.getRemainPlafond() < req.getPrincipalDebt()) throw new BusinessValidationException("Your plafond is insufficient");
+    if (customerDetail.getRemainPlafond() < req.getPrincipalDebt())
+      throw new BusinessValidationException("Your plafond is insufficient");
 
     // Get all doc for this loan
     List<Document> documents = documentService.getDocumentEntitiesByCustomerDetail(customerDetail);
@@ -138,6 +140,14 @@ public class LoanService {
 
     // Substract remain plafond
     customerDetailService.substractRemainPlafond(customerDetail, loan.getPrincipalDebt());
+
+    // Send Notification
+    if (userPrincipal.getUser().getFcmToken() != null) {
+      notificationService.sendNotification(
+          userPrincipal.getUser().getFcmToken(),
+          "Loan Created",
+          "Your loan application has been successfully created.");
+    }
 
     return loanMapper.toResponse(loan);
   }
@@ -236,10 +246,24 @@ public class LoanService {
         .build();
     loan.setStatus(req.getAction());
     loanRepository.save(loan);
+
+    // Send notification to the loan owner
+    User owner = userService.getUserEntity(loan.getCreatedBy());
+    if (owner.getFcmToken() != null) {
+      notificationService.sendNotification(
+          owner.getFcmToken(),
+          "Loan Status Update",
+          "Your loan status has been updated to " + req.getAction());
+    }
+
     return loanStatusHistoryRepository.save(loanStatusHistory);
   }
 
   public LoanResponse getLoanById(UUID id) {
     return loanMapper.toResponse(this.getLoanEntityById(id));
+  }
+
+  public List<LoanResponse> getAllLoanByUserId(UUID userId) {
+    return loanMapper.toResponseList(loanRepository.findAllByCreatedBy(userId));
   }
 }

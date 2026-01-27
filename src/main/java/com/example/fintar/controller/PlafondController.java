@@ -37,7 +37,7 @@ public class PlafondController {
   }
 
   @GetMapping("/{id}")
-  @PreAuthorize("hasAuthority('READ_PLAFOND')")
+//  @PreAuthorize("hasAuthority('READ_PLAFOND')")
   public ResponseEntity<ApiResponse<PlafondResponse>> show(@PathVariable UUID id) {
     PlafondResponse plafond = plafondService.getPlafond(id);
     return ResponseUtil.ok(plafond, "Successfully get plafond");

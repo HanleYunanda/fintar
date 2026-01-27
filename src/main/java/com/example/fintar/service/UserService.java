@@ -42,6 +42,9 @@ public class UserService {
     Set<Role> roles = roleService.getRolesEntityByName(req.getRoles());
     if (roles.isEmpty()) throw new ResourceNotFoundException("Role not found");
 
+    // Cek email unique
+    if(userRepository.findByEmail(req.getEmail()).isPresent()) throw new BusinessValidationException("Email already exist");
+
     User user =
         User.builder()
             .username(req.getUsername())

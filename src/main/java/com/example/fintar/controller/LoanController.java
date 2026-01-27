@@ -2,15 +2,13 @@ package com.example.fintar.controller;
 
 import com.example.fintar.base.ApiResponse;
 import com.example.fintar.dto.*;
-import com.example.fintar.entity.CustomerDetail;
-import com.example.fintar.entity.Document;
-import com.example.fintar.entity.Loan;
-import com.example.fintar.entity.LoanStatusHistory;
+import com.example.fintar.entity.*;
 import com.example.fintar.enums.LoanStatus;
 import com.example.fintar.mapper.CustomerDetailMapper;
 import com.example.fintar.mapper.LoanMapper;
 import com.example.fintar.mapper.LoanStatusHistoryMapper;
 import com.example.fintar.service.LoanService;
+import com.example.fintar.service.UserService;
 import com.example.fintar.util.ResponseUtil;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -63,6 +61,15 @@ public class LoanController {
             )
             .build();
     return ResponseUtil.ok(loanDetailResponse, "Successfully get loan detail");
+  }
+
+  @GetMapping("/user/{userId}")
+  @PreAuthorize("hasAuthority('READ_LOAN')")
+  public ResponseEntity<ApiResponse<List<LoanResponse>>> allLoanByUser(
+          @PathVariable UUID userId
+  ) {
+    List<LoanResponse> loanResponses = loanService.getAllLoanByUserId(userId);
+    return ResponseUtil.ok(loanResponses, "Successfully get loan");
   }
 
   @PostMapping

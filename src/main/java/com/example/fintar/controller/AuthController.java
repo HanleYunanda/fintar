@@ -32,29 +32,39 @@ public class AuthController {
   private final JwtService jwtService;
   private final JwtBlacklistService jwtBlacklistService;
   private final ForgotPasswordService forgotPasswordService;
+  private final com.example.fintar.service.NotificationService notificationService;
 
   @PostMapping("/login")
   public ResponseEntity<ApiResponse<CurrentUserResponse>> login(@RequestBody @Valid LoginUserRequest req) {
     UserPrincipal authenticatedUser = authService.authenticate(req);
-//    Map<String, Object> extraClaims = jwtService.generateExtraClaims(authenticatedUser);
+    // Map<String, Object> extraClaims =
+    // jwtService.generateExtraClaims(authenticatedUser);
     String jwtToken = jwtService.generateToken(authenticatedUser);
-    CurrentUserResponse currentUserResponse =
-            CurrentUserResponse.builder()
-                    .id(authenticatedUser.getUser().getId())
-                    .username(authenticatedUser.getUsername())
-                    .email(authenticatedUser.getUser().getEmail())
-                    .roles(
-                            authenticatedUser.getAuthorities().stream()
-                                    .filter(a -> a.getAuthority().startsWith("ROLE_"))
-                                    .map(a -> a.getAuthority().substring(5)) // hapus prefix "ROLE_"
-                                    .collect(Collectors.toSet()))
-                    .permissions(
-                            authenticatedUser.getAuthorities().stream()
-                                    .filter(a -> !a.getAuthority().startsWith("ROLE_"))
-                                    .map(a -> a.getAuthority())
-                                    .collect(Collectors.toSet()))
-                    .token(jwtToken)
-                    .build();
+    CurrentUserResponse currentUserResponse = CurrentUserResponse.builder()
+        .id(authenticatedUser.getUser().getId())
+        .username(authenticatedUser.getUsername())
+        .email(authenticatedUser.getUser().getEmail())
+        .roles(
+            authenticatedUser.getAuthorities().stream()
+                .filter(a -> a.getAuthority().startsWith("ROLE_"))
+                .map(a -> a.getAuthority().substring(5)) // hapus prefix "ROLE_"
+                .collect(Collectors.toSet()))
+        .permissions(
+            authenticatedUser.getAuthorities().stream()
+                .filter(a -> !a.getAuthority().startsWith("ROLE_"))
+                .map(a -> a.getAuthority())
+                .collect(Collectors.toSet()))
+        .token(jwtToken)
+        .build();
+
+    if (req.getFcmToken() != null) {
+      notificationService.sendNotification(req.getFcmToken(), "Login Successful",
+          "Welcome back, " + authenticatedUser.getUsername() + "!");
+    } else if (authenticatedUser.getUser().getFcmToken() != null) {
+      notificationService.sendNotification(authenticatedUser.getUser().getFcmToken(), "Login Successful",
+          "Welcome back, " + authenticatedUser.getUsername() + "!");
+    }
+
     return ResponseUtil.ok(currentUserResponse, "Successfully log in");
   }
 
@@ -68,22 +78,21 @@ public class AuthController {
   @PreAuthorize("isAuthenticated()")
   public ResponseEntity<ApiResponse<CurrentUserResponse>> getCurrentUser(
       @AuthenticationPrincipal UserPrincipal currentUser) {
-    CurrentUserResponse currentUserResponse =
-        CurrentUserResponse.builder()
-            .id(currentUser.getUser().getId())
-            .username(currentUser.getUsername())
-            .email(currentUser.getUser().getEmail())
-            .roles(
-                currentUser.getAuthorities().stream()
-                    .filter(a -> a.getAuthority().startsWith("ROLE_"))
-                    .map(a -> a.getAuthority().substring(5)) // hapus prefix "ROLE_"
-                    .collect(Collectors.toSet()))
-            .permissions(
-                currentUser.getAuthorities().stream()
-                    .filter(a -> !a.getAuthority().startsWith("ROLE_"))
-                    .map(a -> a.getAuthority())
-                    .collect(Collectors.toSet()))
-            .build();
+    CurrentUserResponse currentUserResponse = CurrentUserResponse.builder()
+        .id(currentUser.getUser().getId())
+        .username(currentUser.getUsername())
+        .email(currentUser.getUser().getEmail())
+        .roles(
+            currentUser.getAuthorities().stream()
+                .filter(a -> a.getAuthority().startsWith("ROLE_"))
+                .map(a -> a.getAuthority().substring(5)) // hapus prefix "ROLE_"
+                .collect(Collectors.toSet()))
+        .permissions(
+            currentUser.getAuthorities().stream()
+                .filter(a -> !a.getAuthority().startsWith("ROLE_"))
+                .map(a -> a.getAuthority())
+                .collect(Collectors.toSet()))
+        .build();
     return ResponseUtil.ok(currentUserResponse, "Successfully get logged in user");
   }
 
@@ -119,7 +128,8 @@ public class AuthController {
   @GetMapping("/reset-password")
   public ResponseEntity<ApiResponse<Object>> validateToken(@RequestParam String token) {
     Boolean isValid = forgotPasswordService.validateToken(token);
-    if (!isValid) return ResponseUtil.error(HttpStatus.BAD_REQUEST, "Token invalid");
+    if (!isValid)
+      return ResponseUtil.error(HttpStatus.BAD_REQUEST, "Token invalid");
     return ResponseUtil.ok(null, "Token valid");
   }
 
@@ -127,7 +137,8 @@ public class AuthController {
   public ResponseEntity<ApiResponse<Object>> resetPassword(
       @RequestParam String token, @RequestParam String newPassword) {
     Boolean isSuccess = forgotPasswordService.resetPassword(token, newPassword);
-    if (!isSuccess) return ResponseUtil.error(HttpStatus.BAD_REQUEST, "Failed to reset password");
+    if (!isSuccess)
+      return ResponseUtil.error(HttpStatus.BAD_REQUEST, "Failed to reset password");
     return ResponseUtil.ok(null, "Successfully reset password");
   }
 }

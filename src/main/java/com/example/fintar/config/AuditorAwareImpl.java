@@ -15,11 +15,15 @@ public class AuditorAwareImpl implements AuditorAware<UUID> {
   public Optional<UUID> getCurrentAuditor() {
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-    if (auth == null || !auth.isAuthenticated()) {
+    if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
       return Optional.of(UUID.fromString("00000000-0000-0000-0000-000000000000"));
     }
 
-    UserPrincipal user = (UserPrincipal) auth.getPrincipal();
-    return Optional.of(user.getUser().getId());
+    if (auth.getPrincipal() instanceof UserPrincipal) {
+      UserPrincipal user = (UserPrincipal) auth.getPrincipal();
+      return Optional.of(user.getUser().getId());
+    }
+
+    return Optional.of(UUID.fromString("00000000-0000-0000-0000-000000000000"));
   }
 }

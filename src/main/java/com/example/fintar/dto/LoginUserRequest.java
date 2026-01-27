@@ -13,8 +13,8 @@ public class LoginUserRequest {
 
   @NotNull(message = "Password is required")
   @NotBlank(message = "Password cannot be blank")
-  @Pattern(
-      regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d).{8,}$",
-      message = "Password format is invalid")
+  @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d).{8,}$", message = "Password format is invalid")
   private String password;
+
+  private String fcmToken;
 }

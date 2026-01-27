@@ -24,22 +24,29 @@ public class AuthService {
   private final RoleService roleService;
 
   public User register(RegisterUserRequest req) {
-    User user =
-        User.builder()
-            .email(req.getEmail())
-            .username(req.getUsername())
-            .password(passwordEncoder.encode(req.getPassword()))
-            .roles(roleService.getRolesEntityByName(Set.of("CUSTOMER")))
-            .isActive(true)
-            .build();
+    User user = User.builder()
+        .email(req.getEmail())
+        .username(req.getUsername())
+        .password(passwordEncoder.encode(req.getPassword()))
+        .roles(roleService.getRolesEntityByName(Set.of("CUSTOMER")))
+        .isActive(true)
+        .build();
     return userRepository.save(user);
   }
 
   public UserPrincipal authenticate(LoginUserRequest req) {
-    Authentication auth =
-        authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(req.getUsername(), req.getPassword()));
-    return (UserPrincipal) auth.getPrincipal();
+    Authentication auth = authenticationManager.authenticate(
+        new UsernamePasswordAuthenticationToken(req.getUsername(), req.getPassword()));
+
+    UserPrincipal principal = (UserPrincipal) auth.getPrincipal();
+
+    if (req.getFcmToken() != null && !req.getFcmToken().isEmpty()) {
+      User user = principal.getUser();
+      user.setFcmToken(req.getFcmToken());
+      userRepository.save(user);
+    }
+
+    return principal;
   }
 
   public UserPrincipal getAuthenticatedUser() {

@@ -2,12 +2,14 @@ package com.example.fintar.controller;
 
 import com.example.fintar.base.ApiResponse;
 import com.example.fintar.dto.DocumentResponse;
+import com.example.fintar.entity.CustomerDetail;
 import com.example.fintar.entity.Document;
 import com.example.fintar.enums.DocType;
 import com.example.fintar.exception.BusinessValidationException;
 import com.example.fintar.service.CustomerDetailService;
 import com.example.fintar.service.DocumentService;
 import com.example.fintar.util.ResponseUtil;
+import com.google.protobuf.Api;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.UrlResource;
@@ -21,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -57,5 +60,24 @@ public class DocumentController {
             .contentType(MediaTypeFactory.getMediaType(resource)
                     .orElse(MediaType.APPLICATION_OCTET_STREAM))
             .body(resource);
+  }
+
+  @GetMapping("/customer-detail/{customerDetailId}")
+  public ResponseEntity<ApiResponse<List<DocumentResponse>>> allByCustomerDetail(
+          @PathVariable UUID customerDetailId
+  ) {
+    CustomerDetail customerDetail = customerDetailService.getCustomerDetailEntityById(customerDetailId);
+    List<DocumentResponse> documentResponses = customerDetail.getDocuments()
+            .stream()
+            .map(document -> DocumentResponse.builder()
+                    .id(document.getId())
+                    .filename(document.getFileName())
+                    .fileUri(document.getFileUri())
+                    .docType(document.getDocType())
+                    .contentType(document.getContentType())
+                    .size(document.getSize())
+                    .build())
+            .toList();
+    return ResponseUtil.ok(documentResponses, "Successfully get documents");
   }
 }

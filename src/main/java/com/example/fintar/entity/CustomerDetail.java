@@ -5,6 +5,7 @@ import com.example.fintar.enums.MaritalStatus;
 import com.example.fintar.enums.Religion;
 import jakarta.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.*;
@@ -32,7 +33,7 @@ public class CustomerDetail extends BaseEntity implements Serializable {
 
   private String placeOfBirth;
 
-  private LocalDateTime dateOfBirth;
+  private LocalDate dateOfBirth;
 
   private Boolean isMale;
 

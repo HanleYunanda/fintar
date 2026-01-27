@@ -79,4 +79,5 @@ public interface LoanRepository extends JpaRepository<Loan, UUID> {
             """)
     List<com.example.fintar.dto.BestSellingProductDTO> findBestSellingProducts(@Param("limit") Integer limit);
 
+    List<Loan> findAllByCreatedBy(UUID userId);
 }
