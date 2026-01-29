@@ -7,6 +7,7 @@ import com.example.fintar.entity.CustomerDetail;
 import com.example.fintar.entity.Document;
 import com.example.fintar.entity.Plafond;
 import com.example.fintar.entity.User;
+import com.example.fintar.entity.UserPrincipal;
 import com.example.fintar.exception.BusinessValidationException;
 import com.example.fintar.exception.ResourceNotFoundException;
 import com.example.fintar.mapper.CustomerDetailMapper;
@@ -16,6 +17,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,7 +28,7 @@ public class CustomerDetailService {
   private final CustomerDetailRepository customerDetailRepository;
   private final CustomerDetailMapper customerDetailMapper;
   private final UserService userService;
-  private final AuthService authService;
+  // private final AuthService authService;
   private final PlafondService plafondService;
   private final PlafondMapper plafondMapper;
 
@@ -104,35 +107,36 @@ public class CustomerDetailService {
 
   public CustomerDetail getCustomerDetailEntityById(UUID id) {
     Optional<CustomerDetail> customerDetail = customerDetailRepository.findById(id);
-    if (customerDetail.isEmpty()) throw new ResourceNotFoundException("Customer detail not found");
+    if (customerDetail.isEmpty())
+      throw new ResourceNotFoundException("Customer detail not found");
     return customerDetail.get();
   }
 
   public CustomerDetailResponse getCustomerDetailById(UUID id) {
     CustomerDetail customerDetail = this.getCustomerDetailEntityById(id);
     CustomerDetailResponse customerDetailResponse = customerDetailMapper.toResponse(customerDetail);
-    if(customerDetail.getPlafond() == null) throw new BusinessValidationException("Plafond is not set for this customer");
+    if (customerDetail.getPlafond() == null)
+      throw new BusinessValidationException("Plafond is not set for this customer");
     customerDetailResponse.setPlafond(plafondMapper.toResponse(customerDetail.getPlafond()));
     customerDetailResponse.setDocuments(
-            customerDetail.getDocuments()
-                    .stream()
-                    .map(document ->
-                            DocumentResponse.builder()
-                                    .id(document.getId())
-                                    .filename(document.getFileName())
-                                    .fileUri(document.getFileUri())
-                                    .contentType(document.getContentType())
-                                    .size(document.getSize())
-                                    .docType(document.getDocType())
-                                    .build()
-                    ).toList()
-    );
+        customerDetail.getDocuments()
+            .stream()
+            .map(document -> DocumentResponse.builder()
+                .id(document.getId())
+                .filename(document.getFileName())
+                .fileUri(document.getFileUri())
+                .contentType(document.getContentType())
+                .size(document.getSize())
+                .docType(document.getDocType())
+                .build())
+            .toList());
     return customerDetailResponse;
   }
 
   public CustomerDetailResponse getCustomerDetailByUserId(UUID userId) {
     User user = userService.getUserEntity(userId);
-    if(user.getCustomerDetail() == null) throw new BusinessValidationException("Customer detail has not been created");
+    if (user.getCustomerDetail() == null)
+      throw new BusinessValidationException("Customer detail has not been created");
     CustomerDetail customerDetail = user.getCustomerDetail();
     CustomerDetailResponse customerDetailResponse = customerDetailMapper.toResponse(customerDetail);
     customerDetailResponse.setPlafond(plafondMapper.toResponse(customerDetail.getPlafond()));
@@ -141,9 +145,12 @@ public class CustomerDetailService {
   }
 
   public CustomerDetail getCustomerDetailEntityByLoggedInUser() {
-    User user = authService.getAuthenticatedUser().getUser();
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
+    User user = userPrincipal.getUser();
     CustomerDetail customerDetail = user.getCustomerDetail();
-    if (customerDetail == null) throw new ResourceNotFoundException("Customer detail not found");
+    if (customerDetail == null)
+      throw new ResourceNotFoundException("Customer detail not found");
     return customerDetail;
   }
 

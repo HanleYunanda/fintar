@@ -1,0 +1,28 @@
+﻿[INFO] Error stacktraces are turned on.
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -------------------------< com.example:fintar >-------------------------
+[INFO] Building fintar 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.5.0:clean (default-clean) @ fintar ---
+[INFO] Deleting C:\BCAF\Bootcamp\fintar\target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ fintar ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 2 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.14.1:compile (default-compile) @ fintar ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 109 source files with javac [debug parameters release 21] to target\classes
+[WARNING] /C:/BCAF/Bootcamp/fintar/src/main/java/com/example/fintar/entity/User.java:[39,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/BCAF/Bootcamp/fintar/src/main/java/com/example/fintar/dto/RoleResponse.java:[14,35] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/BCAF/Bootcamp/fintar/src/main/java/com/example/fintar/entity/Permission.java:[26,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/BCAF/Bootcamp/fintar/src/main/java/com/example/fintar/entity/Role.java:[36,27] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  8.244 s
+[INFO] Finished at: 2026-01-28T09:49:19+07:00
+[INFO] ------------------------------------------------------------------------

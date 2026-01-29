@@ -18,6 +18,12 @@ public class UserPrincipal implements UserDetails {
 
   private final User user;
 
+  public static UserPrincipal create(User user) {
+    return UserPrincipal.builder()
+        .user(user)
+        .build();
+  }
+
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     Set<GrantedAuthority> authorities = new HashSet<>();
@@ -44,25 +50,25 @@ public class UserPrincipal implements UserDetails {
 
   @Override
   public boolean isAccountNonExpired() {
-    //        return UserDetails.super.isAccountNonExpired();
+    // return UserDetails.super.isAccountNonExpired();
     return true;
   }
 
   @Override
   public boolean isAccountNonLocked() {
-    //        return UserDetails.super.isAccountNonLocked();
+    // return UserDetails.super.isAccountNonLocked();
     return true;
   }
 
   @Override
   public boolean isCredentialsNonExpired() {
-    //        return UserDetails.super.isCredentialsNonExpired();
+    // return UserDetails.super.isCredentialsNonExpired();
     return true;
   }
 
   @Override
   public boolean isEnabled() {
-    //        return UserDetails.super.isEnabled();
+    // return UserDetails.super.isEnabled();
     return !user.isDeleted;
   }
 }

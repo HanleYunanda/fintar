@@ -15,20 +15,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class NotificationService {
 
-    @PostConstruct
-    public void initialize() {
-        try {
-            if (FirebaseApp.getApps().isEmpty()) {
-                InputStream serviceAccount = new ClassPathResource("firebase-service-account.json").getInputStream();
-                FirebaseOptions options = FirebaseOptions.builder()
-                        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                        .build();
-                FirebaseApp.initializeApp(options);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    // Firebase intialized in FirebaseConfig
 
     public void sendNotification(String token, String title, String body) {
         if (token == null || token.isEmpty()) {

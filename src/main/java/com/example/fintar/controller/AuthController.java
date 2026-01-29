@@ -1,15 +1,11 @@
 package com.example.fintar.controller;
 
 import com.example.fintar.base.ApiResponse;
-import com.example.fintar.dto.CurrentUserResponse;
-import com.example.fintar.dto.LoginUserRequest;
-import com.example.fintar.dto.RegisterUserRequest;
+import com.example.fintar.dto.*;
+import com.example.fintar.entity.CustomerDetail;
 import com.example.fintar.entity.User;
 import com.example.fintar.entity.UserPrincipal;
-import com.example.fintar.service.AuthService;
-import com.example.fintar.service.ForgotPasswordService;
-import com.example.fintar.service.JwtBlacklistService;
-import com.example.fintar.service.JwtService;
+import com.example.fintar.service.*;
 import com.example.fintar.util.ResponseUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,7 +28,8 @@ public class AuthController {
   private final JwtService jwtService;
   private final JwtBlacklistService jwtBlacklistService;
   private final ForgotPasswordService forgotPasswordService;
-  private final com.example.fintar.service.NotificationService notificationService;
+  private final NotificationService notificationService;
+  private final CustomerDetailService customerDetailService;
 
   @PostMapping("/login")
   public ResponseEntity<ApiResponse<CurrentUserResponse>> login(@RequestBody @Valid LoginUserRequest req) {
@@ -68,9 +65,45 @@ public class AuthController {
     return ResponseUtil.ok(currentUserResponse, "Successfully log in");
   }
 
+  @PostMapping("/google-login")
+  public ResponseEntity<ApiResponse<CurrentUserResponse>> loginWithGoogle(@RequestBody @Valid GoogleLoginRequest req) {
+    UserPrincipal authenticatedUser = authService.loginWithGoogle(req);
+    String jwtToken = jwtService.generateToken(authenticatedUser);
+    CurrentUserResponse currentUserResponse = CurrentUserResponse.builder()
+        .id(authenticatedUser.getUser().getId())
+        .username(authenticatedUser.getUsername())
+        .email(authenticatedUser.getUser().getEmail())
+        .roles(
+            authenticatedUser.getAuthorities().stream()
+                .filter(a -> a.getAuthority().startsWith("ROLE_"))
+                .map(a -> a.getAuthority().substring(5))
+                .collect(Collectors.toSet()))
+        .permissions(
+            authenticatedUser.getAuthorities().stream()
+                .filter(a -> !a.getAuthority().startsWith("ROLE_"))
+                .map(a -> a.getAuthority())
+                .collect(Collectors.toSet()))
+        .token(jwtToken)
+        .build();
+
+    if (req.getFcmToken() != null) {
+      notificationService.sendNotification(req.getFcmToken(), "Login Successful",
+          "Welcome back, " + authenticatedUser.getUsername() + "!");
+    } else if (authenticatedUser.getUser().getFcmToken() != null) {
+      notificationService.sendNotification(authenticatedUser.getUser().getFcmToken(), "Login Successful",
+          "Welcome back, " + authenticatedUser.getUsername() + "!");
+    }
+
+    return ResponseUtil.ok(currentUserResponse, "Successfully log in with Google");
+  }
+
   @PostMapping("/signup")
   public ResponseEntity<ApiResponse<User>> signup(@RequestBody @Valid RegisterUserRequest req) {
     User registeredUser = authService.register(req);
+    CustomerDetailResponse customerDetail = customerDetailService.createCustomerDetail(
+        CustomerDetailRequest.builder()
+            .userId(registeredUser.getId())
+            .build());
     return ResponseUtil.created(null, "Successfully sign up");
   }
 

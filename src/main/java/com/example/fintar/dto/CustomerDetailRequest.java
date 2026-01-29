@@ -10,9 +10,12 @@ import jakarta.validation.constraints.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
+
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class CustomerDetailRequest {
 
   @NotNull(message = "User ID is required")

@@ -32,7 +32,6 @@ public class ProductController {
   }
 
   @GetMapping("/plafond/{plafondId}")
-  @PreAuthorize("isAuthenticated()")
   public ResponseEntity<ApiResponse<List<ProductResponse>>> allProductByPlafond(
           @PathVariable UUID plafondId
           ) {
