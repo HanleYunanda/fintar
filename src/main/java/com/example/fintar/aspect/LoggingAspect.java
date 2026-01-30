@@ -15,7 +15,6 @@ public class LoggingAspect {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    // Define pointcut for all methods in the service package
     @Pointcut("execution(* com.example.fintar.service..*(..))")
     public void serviceMethods() {
     }
