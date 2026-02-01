@@ -24,6 +24,10 @@ public class LoanResponse {
   @Enumerated(EnumType.STRING)
   private LoanStatus status;
 
+  private Double latitude;
+
+  private Double longitude;
+
   private LocalDateTime createdAt;
 
   private List<LoanStatusHistoryResponse> loanStatusHistories;

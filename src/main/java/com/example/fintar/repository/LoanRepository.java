@@ -1,7 +1,11 @@
 package com.example.fintar.repository;
 
+import com.example.fintar.dto.ApplicationStatusDTO;
+import com.example.fintar.dto.BestSellingProductDTO;
 import com.example.fintar.entity.Loan;
 import java.util.UUID;
+
+import com.example.fintar.enums.LoanStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -64,7 +68,7 @@ public interface LoanRepository extends JpaRepository<Loan, UUID> {
             FROM Loan l
             GROUP BY l.status
             """)
-    List<com.example.fintar.dto.ApplicationStatusDTO> countApplicationsByStatus();
+    List<ApplicationStatusDTO> countApplicationsByStatus();
 
     @Query("""
             SELECT new com.example.fintar.dto.BestSellingProductDTO(
@@ -77,7 +81,7 @@ public interface LoanRepository extends JpaRepository<Loan, UUID> {
             ORDER BY COUNT(l) DESC
             LIMIT :limit
             """)
-    List<com.example.fintar.dto.BestSellingProductDTO> findBestSellingProducts(@Param("limit") Integer limit);
+    List<BestSellingProductDTO> findBestSellingProducts(@Param("limit") Integer limit);
 
     List<Loan> findAllByCreatedBy(UUID userId);
 }

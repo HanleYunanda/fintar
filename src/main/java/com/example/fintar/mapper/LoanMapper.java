@@ -26,6 +26,8 @@ public class LoanMapper {
         .status(loan.getStatus())
         .createdAt(loan.getCreatedAt())
         .loanStatusHistories(loanStatusHistoryMapper.toResponseList(loan.getStatusHistories()))
+        .latitude(loan.getLatitude())
+        .longitude(loan.getLongitude())
         .build();
   }
 

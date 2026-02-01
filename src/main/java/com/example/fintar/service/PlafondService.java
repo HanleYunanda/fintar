@@ -59,10 +59,10 @@ public class PlafondService {
     plafondRepository.delete(plafond);
   }
 
-    public Plafond getPlafondEntityByName(String name) {
-      Optional<Plafond> plafond = plafondRepository.findByName(name);
-      if (plafond.isEmpty())
-        throw new ResourceNotFoundException("Plafond with name " + name + " not found");
-      return plafond.get();
-    }
+  public Plafond getPlafondEntityByName(String name) {
+    Optional<Plafond> plafond = plafondRepository.findByName(name);
+    if (plafond.isEmpty())
+      throw new ResourceNotFoundException("Plafond with name " + name + " not found");
+    return plafond.get();
+  }
 }

@@ -158,4 +158,6 @@ public class CustomerDetailService {
     customerDetail.setRemainPlafond(customerDetail.getRemainPlafond() - principalDebt);
     return customerDetailRepository.save(customerDetail);
   }
+
+
 }

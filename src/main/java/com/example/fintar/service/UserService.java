@@ -94,16 +94,12 @@ public class UserService {
       UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
 
       // Check if user belong to logged in user
-      System.out.println("TEST");
-      System.out.println(userPrincipal.getUser().getId());
-      System.out.println(id);
-      System.out.println(userPrincipal.getUser().getId() != user.getId());
       if(!Objects.equals(userPrincipal.getUser().getId(), user.getId())) throw new BusinessValidationException("Cannot change other user password");
 
       // Check if old password valid
-      if(!Objects.equals(user.getPassword(), passwordEncoder.encode(request.getOldPassword()))) throw new BusinessValidationException("Old Password Invalid");
-
+      if(!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) throw new BusinessValidationException("Old Password Invalid");
       user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+
       return userMapper.toResponse(userRepository.save(user));
 
     }

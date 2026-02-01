@@ -52,4 +52,8 @@ public class Loan extends BaseEntity {
   )
   private List<Document> documents;
 
+  private Double latitude;
+
+  private Double longitude;
+
 }

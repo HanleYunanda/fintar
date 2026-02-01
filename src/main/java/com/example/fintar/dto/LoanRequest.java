@@ -37,4 +37,8 @@ public class LoanRequest {
   @NotNull(message = "Installment Payment is required")
   @Min(value = 0, message = "Installment Payment cannot be negative")
   private Long installmentPayment;
+
+  private Double latitude;
+
+  private Double longitude;
 }
