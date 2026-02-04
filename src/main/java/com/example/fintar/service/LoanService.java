@@ -137,9 +137,6 @@ public class LoanService {
     loan.setStatusHistories(this.getLoanStatusHistoriesEntityByLoan(loan.getId()));
     // loan = this.getLoanEntityById(loan.getId());
 
-    // Substract remain plafond
-    customerDetailService.substractRemainPlafond(customerDetail, loan.getPrincipalDebt());
-
     // Send Notification
     if (userPrincipal.getUser().getFcmToken() != null) {
       notificationService.sendNotification(
@@ -211,6 +208,10 @@ public class LoanService {
     // Check : loan must be approved first
     if (loan.getStatus() != LoanStatus.APPROVED)
       throw new BusinessValidationException("Loan application has not been approved");
+
+    // Substract remain plafond
+    CustomerDetail customerDetail = userService.getUserEntity(loan.getCreatedBy()).getCustomerDetail();
+    customerDetailService.substractRemainPlafond(customerDetail, loan.getPrincipalDebt());
 
     return loanStatusHistoryMapper.toResponse(this.changeStatusApproval(loan, req));
   }

@@ -32,6 +32,7 @@ public class CustomerDetailMapper {
         .workplace(customerDetail.getWorkplace())
         .salary(customerDetail.getSalary())
         .accountNumber(customerDetail.getAccountNumber())
+        .remainPlafond(customerDetail.getRemainPlafond())
         .build();
   }
 

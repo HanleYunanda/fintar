@@ -121,6 +121,7 @@ public class CustomerDetailService {
     customerDetailResponse.setDocuments(
         customerDetail.getDocuments()
             .stream()
+            .filter(Document::getIsActive)
             .map(document -> DocumentResponse.builder()
                 .id(document.getId())
                 .filename(document.getFileName())
