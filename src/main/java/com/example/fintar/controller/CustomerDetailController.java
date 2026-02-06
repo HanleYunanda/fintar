@@ -3,7 +3,6 @@ package com.example.fintar.controller;
 import com.example.fintar.base.ApiResponse;
 import com.example.fintar.dto.CustomerDetailRequest;
 import com.example.fintar.dto.CustomerDetailResponse;
-import com.example.fintar.entity.User;
 import com.example.fintar.service.CustomerDetailService;
 import com.example.fintar.service.UserService;
 import com.example.fintar.util.ResponseUtil;
@@ -48,19 +47,16 @@ public class CustomerDetailController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<ApiResponse<CustomerDetailResponse>> show(
-          @PathVariable UUID id
-  ) {
+  public ResponseEntity<ApiResponse<CustomerDetailResponse>> show(@PathVariable UUID id) {
     CustomerDetailResponse customerDetailResponse = customerDetailService.getCustomerDetailById(id);
     return ResponseUtil.ok(customerDetailResponse, "Successfully get customer detail");
   }
 
   @GetMapping("/user/{userId}")
   public ResponseEntity<ApiResponse<CustomerDetailResponse>> getUserCustomerDetail(
-          @PathVariable UUID userId
-  ) {
-    CustomerDetailResponse customerDetailResponse = customerDetailService.getCustomerDetailByUserId(userId);
+      @PathVariable UUID userId) {
+    CustomerDetailResponse customerDetailResponse =
+        customerDetailService.getCustomerDetailByUserId(userId);
     return ResponseUtil.ok(customerDetailResponse, "Successfully get customer detail");
   }
-
 }

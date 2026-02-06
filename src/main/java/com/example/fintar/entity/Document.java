@@ -2,11 +2,10 @@ package com.example.fintar.entity;
 
 import com.example.fintar.enums.DocType;
 import jakarta.persistence.*;
+import java.util.List;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
-
-import java.util.List;
 
 @Entity
 @Table(name = "documents")
@@ -32,9 +31,8 @@ public class Document extends BaseEntity {
 
   @ManyToMany
   @JoinTable(
-          name = "loan_documents",
-          joinColumns = @JoinColumn(name = "document_id"),
-          inverseJoinColumns = @JoinColumn(name = "loan_id")
-  )
+      name = "loan_documents",
+      joinColumns = @JoinColumn(name = "document_id"),
+      inverseJoinColumns = @JoinColumn(name = "loan_id"))
   private List<Loan> loans;
 }

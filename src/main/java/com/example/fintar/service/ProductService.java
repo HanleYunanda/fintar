@@ -48,7 +48,7 @@ public class ProductService {
     return product.get();
   }
 
-    public List<ProductResponse> getAllProductByPlafond(Plafond plafond) {
-      return productMapper.toResponseList(productRepository.findAllByPlafond(plafond));
-    }
+  public List<ProductResponse> getAllProductByPlafond(Plafond plafond) {
+    return productMapper.toResponseList(productRepository.findAllByPlafond(plafond));
+  }
 }

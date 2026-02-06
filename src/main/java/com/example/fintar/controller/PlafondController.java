@@ -3,7 +3,6 @@ package com.example.fintar.controller;
 import com.example.fintar.base.ApiResponse;
 import com.example.fintar.dto.PlafondRequest;
 import com.example.fintar.dto.PlafondResponse;
-import com.example.fintar.entity.Plafond;
 import com.example.fintar.service.PlafondService;
 import com.example.fintar.util.ResponseUtil;
 import jakarta.validation.Valid;

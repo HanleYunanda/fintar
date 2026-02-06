@@ -14,7 +14,6 @@ import com.example.fintar.mapper.CustomerDetailMapper;
 import com.example.fintar.mapper.PlafondMapper;
 import com.example.fintar.repository.CustomerDetailRepository;
 import com.example.fintar.repository.LoanRepository;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -110,8 +109,7 @@ public class CustomerDetailService {
 
   public CustomerDetail getCustomerDetailEntityById(UUID id) {
     Optional<CustomerDetail> customerDetail = customerDetailRepository.findById(id);
-    if (customerDetail.isEmpty())
-      throw new ResourceNotFoundException("Customer detail not found");
+    if (customerDetail.isEmpty()) throw new ResourceNotFoundException("Customer detail not found");
     return customerDetail.get();
   }
 
@@ -122,17 +120,18 @@ public class CustomerDetailService {
       throw new BusinessValidationException("Plafond is not set for this customer");
     customerDetailResponse.setPlafond(plafondMapper.toResponse(customerDetail.getPlafond()));
     customerDetailResponse.setDocuments(
-        customerDetail.getDocuments()
-            .stream()
+        customerDetail.getDocuments().stream()
             .filter(Document::getIsActive)
-            .map(document -> DocumentResponse.builder()
-                .id(document.getId())
-                .filename(document.getFileName())
-                .fileUri(document.getFileUri())
-                .contentType(document.getContentType())
-                .size(document.getSize())
-                .docType(document.getDocType())
-                .build())
+            .map(
+                document ->
+                    DocumentResponse.builder()
+                        .id(document.getId())
+                        .filename(document.getFileName())
+                        .fileUri(document.getFileUri())
+                        .contentType(document.getContentType())
+                        .size(document.getSize())
+                        .docType(document.getDocType())
+                        .build())
             .toList());
     return customerDetailResponse;
   }
@@ -153,8 +152,7 @@ public class CustomerDetailService {
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
     User user = userPrincipal.getUser();
     CustomerDetail customerDetail = user.getCustomerDetail();
-    if (customerDetail == null)
-      throw new ResourceNotFoundException("Customer detail not found");
+    if (customerDetail == null) throw new ResourceNotFoundException("Customer detail not found");
     return customerDetail;
   }
 
@@ -178,7 +176,8 @@ public class CustomerDetailService {
     if (currentPlafond.getOrderNumber() != null && currentPlafond.getOrderNumber() < maxOrder) {
       Long totalDisbursed = loanRepository.sumDisbursedLoansByUser(userId);
 
-      if (currentPlafond.getNextPlafondLimit() != null && totalDisbursed > currentPlafond.getNextPlafondLimit()) {
+      if (currentPlafond.getNextPlafondLimit() != null
+          && totalDisbursed > currentPlafond.getNextPlafondLimit()) {
         Integer nextOrder = currentPlafond.getOrderNumber() + 1;
         Optional<Plafond> nextPlafondOpt = plafondService.getPlafondByOrderNumber(nextOrder);
 
@@ -188,5 +187,4 @@ public class CustomerDetailService {
       }
     }
   }
-
 }

@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BestSellingProductDTO {
-    private String productName;
-    private Long count;
+  private String productName;
+  private Long count;
 }

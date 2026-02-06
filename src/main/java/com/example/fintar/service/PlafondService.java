@@ -13,10 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -69,26 +66,28 @@ public class PlafondService {
     if (plafond.isEmpty())
       throw new ResourceNotFoundException("Plafond with name " + name + " not found");
     return plafond.get();
-
   }
 
   @Transactional
   public List<PlafondResponse> updatePlafondOrders(List<PlafondOrderRequest> reqs) {
-    Map<UUID, Integer> orderMap = reqs.stream()
-        .collect(Collectors.toMap(PlafondOrderRequest::getId,
-            PlafondOrderRequest::getOrderNumber));
+    Map<UUID, Integer> orderMap =
+        reqs.stream()
+            .collect(
+                Collectors.toMap(PlafondOrderRequest::getId, PlafondOrderRequest::getOrderNumber));
 
     List<Plafond> allPlafonds = plafondRepository.findAll();
-    allPlafonds.forEach(plafond -> {
-      plafond.setOrderNumber(orderMap.get(plafond.getId()));
-    });
+    allPlafonds.forEach(
+        plafond -> {
+          plafond.setOrderNumber(orderMap.get(plafond.getId()));
+        });
 
     plafondRepository.saveAll(allPlafonds);
     return plafondMapper.toResponseList(allPlafonds);
   }
 
   public List<PlafondResponse> getActivePlafonds() {
-    return plafondMapper.toResponseList(plafondRepository.findByOrderNumberIsNotNullOrderByOrderNumberAsc());
+    return plafondMapper.toResponseList(
+        plafondRepository.findByOrderNumberIsNotNullOrderByOrderNumberAsc());
   }
 
   public Optional<Plafond> getPlafondByOrderNumber(Integer orderNumber) {

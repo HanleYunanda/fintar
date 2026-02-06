@@ -39,9 +39,7 @@ public class RoleController {
 
   @GetMapping("/{id}")
   @PreAuthorize("hasAuthority('READ_ROLE')")
-  public ResponseEntity<ApiResponse<RoleResponse>> show(
-          @PathVariable UUID id
-  ) {
+  public ResponseEntity<ApiResponse<RoleResponse>> show(@PathVariable UUID id) {
     RoleResponse role = roleService.getRoleById(id);
     return ResponseUtil.ok(role, "Successfully create new role");
   }

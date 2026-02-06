@@ -10,7 +10,6 @@ import com.example.fintar.util.ResponseUtil;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,7 +24,7 @@ public class ProductController {
   private final PlafondService plafondService;
 
   @GetMapping
-//  @PreAuthorize("hasAuthority('READ_PRODUCT')")
+  //  @PreAuthorize("hasAuthority('READ_PRODUCT')")
   public ResponseEntity<ApiResponse<List<ProductResponse>>> index() {
     List<ProductResponse> products = productService.getAllProduct();
     return ResponseUtil.ok(products, "Successfully get all products");
@@ -33,8 +32,7 @@ public class ProductController {
 
   @GetMapping("/plafond/{plafondId}")
   public ResponseEntity<ApiResponse<List<ProductResponse>>> allProductByPlafond(
-          @PathVariable UUID plafondId
-          ) {
+      @PathVariable UUID plafondId) {
     Plafond plafond = plafondService.getPlafondEntity(plafondId);
     List<ProductResponse> productResponses = productService.getAllProductByPlafond(plafond);
     return ResponseUtil.ok(productResponses, "Successfully get all products");

@@ -5,7 +5,6 @@ import com.example.fintar.dto.ChangePasswordRequest;
 import com.example.fintar.dto.UserRequest;
 import com.example.fintar.dto.UserResponse;
 import com.example.fintar.dto.UserUpdateRequest;
-import com.example.fintar.entity.User;
 import com.example.fintar.service.UserService;
 import com.example.fintar.util.ResponseUtil;
 import jakarta.validation.Valid;
@@ -55,10 +54,8 @@ public class UserController {
   @PatchMapping("/{id}/changePassword")
   @PreAuthorize("hasAuthority('CHANGE_PASSWORD')")
   public ResponseEntity<ApiResponse<UserResponse>> changePassword(
-          @PathVariable UUID id,
-          @RequestBody @Valid ChangePasswordRequest req
-  ) {
-    UserResponse userResponse =userService.updatePassword(id, req);
+      @PathVariable UUID id, @RequestBody @Valid ChangePasswordRequest req) {
+    UserResponse userResponse = userService.updatePassword(id, req);
     return ResponseUtil.ok(userResponse, "Successfully delete user");
   }
 

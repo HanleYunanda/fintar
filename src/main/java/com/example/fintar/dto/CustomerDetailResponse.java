@@ -6,9 +6,7 @@ import com.example.fintar.enums.Religion;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.*;
-
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -48,6 +46,5 @@ public class CustomerDetailResponse {
 
   private PlafondResponse plafond;
   private Double remainPlafond;
-  @Builder.Default
-  private List<DocumentResponse> documents = new ArrayList<>();
+  @Builder.Default private List<DocumentResponse> documents = new ArrayList<>();
 }

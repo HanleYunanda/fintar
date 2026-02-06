@@ -57,7 +57,8 @@ public class LoanService {
       throw new BusinessValidationException("Tenor exceeding the permitted limit");
 
     // Check simulation result
-    Long interestAmount = Math.round(req.getPrincipalDebt() * (req.getInterestRate() / 100) * req.getTenor());
+    Long interestAmount =
+        Math.round(req.getPrincipalDebt() * (req.getInterestRate() / 100) * req.getTenor());
     Long outstandingDebt = req.getPrincipalDebt() + interestAmount;
     Long installmentPayment = outstandingDebt / req.getTenor();
 
@@ -111,27 +112,29 @@ public class LoanService {
     List<Document> documents = documentService.getDocumentEntitiesByCustomerDetail(customerDetail);
 
     // Create loan
-    Loan loan = Loan.builder()
-        .product(product)
-        .principalDebt(req.getPrincipalDebt())
-        .outstandingDebt(req.getOutstandingDebt())
-        .tenor(req.getTenor())
-        .interestRate(req.getInterestRate())
-        .installmentPayment(req.getInstallmentPayment())
-        .status(LoanStatus.CREATED)
-        .documents(documents)
-        .latitude(req.getLatitude())
-        .longitude(req.getLongitude())
-        .build();
+    Loan loan =
+        Loan.builder()
+            .product(product)
+            .principalDebt(req.getPrincipalDebt())
+            .outstandingDebt(req.getOutstandingDebt())
+            .tenor(req.getTenor())
+            .interestRate(req.getInterestRate())
+            .installmentPayment(req.getInstallmentPayment())
+            .status(LoanStatus.CREATED)
+            .documents(documents)
+            .latitude(req.getLatitude())
+            .longitude(req.getLongitude())
+            .build();
     loan = loanRepository.save(loan);
 
     // Create loan status history
-    LoanStatusHistory loanStatusHistory = LoanStatusHistory.builder()
-        .loan(loan)
-        .action(LoanStatus.CREATED)
-        .performedBy(userPrincipal.getUser())
-        .performedAt(LocalDateTime.now())
-        .build();
+    LoanStatusHistory loanStatusHistory =
+        LoanStatusHistory.builder()
+            .loan(loan)
+            .action(LoanStatus.CREATED)
+            .performedBy(userPrincipal.getUser())
+            .performedAt(LocalDateTime.now())
+            .build();
     loanStatusHistory = loanStatusHistoryRepository.save(loanStatusHistory);
 
     loan.setStatusHistories(this.getLoanStatusHistoriesEntityByLoan(loan.getId()));
@@ -150,8 +153,7 @@ public class LoanService {
 
   public Loan getLoanEntityById(UUID id) {
     Optional<Loan> loan = loanRepository.findById(id);
-    if (loan.isEmpty())
-      throw new ResourceNotFoundException("Loan with id " + id + " not found");
+    if (loan.isEmpty()) throw new ResourceNotFoundException("Loan with id " + id + " not found");
     return loan.get();
   }
 
@@ -210,7 +212,8 @@ public class LoanService {
       throw new BusinessValidationException("Loan application has not been approved");
 
     // Substract remain plafond
-    CustomerDetail customerDetail = userService.getUserEntity(loan.getCreatedBy()).getCustomerDetail();
+    CustomerDetail customerDetail =
+        userService.getUserEntity(loan.getCreatedBy()).getCustomerDetail();
     customerDetailService.substractRemainPlafond(customerDetail, loan.getPrincipalDebt());
 
     // Upgrade Plafond Logic
@@ -225,13 +228,14 @@ public class LoanService {
     UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
 
     // Create new status history
-    LoanStatusHistory loanStatusHistory = LoanStatusHistory.builder()
-        .loan(loan)
-        .action(req.getAction())
-        .note(req.getNote())
-        .performedBy(userPrincipal.getUser())
-        .performedAt(LocalDateTime.now())
-        .build();
+    LoanStatusHistory loanStatusHistory =
+        LoanStatusHistory.builder()
+            .loan(loan)
+            .action(req.getAction())
+            .note(req.getNote())
+            .performedBy(userPrincipal.getUser())
+            .performedAt(LocalDateTime.now())
+            .build();
     loan.setStatus(req.getAction());
     loanRepository.save(loan);
 
@@ -254,5 +258,4 @@ public class LoanService {
   public List<LoanResponse> getAllLoanByUserId(UUID userId) {
     return loanMapper.toResponseList(loanRepository.findAllByCreatedBy(userId));
   }
-
 }

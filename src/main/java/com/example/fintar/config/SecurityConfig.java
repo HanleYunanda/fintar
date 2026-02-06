@@ -32,13 +32,18 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http.csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.disable())
-            .cors(Customizer.withDefaults())
-            .authorizeHttpRequests(
+        .cors(Customizer.withDefaults())
+        .authorizeHttpRequests(
             authorizationManagerRequestMatcherRegistry ->
                 authorizationManagerRequestMatcherRegistry
                     .requestMatchers(WHITE_LIST)
                     .permitAll()
-                    .requestMatchers(HttpMethod.GET, "/document/**", "/plafond", "/plafond/active", "/product/**")
+                    .requestMatchers(
+                        HttpMethod.GET,
+                        "/document/**",
+                        "/plafond",
+                        "/plafond/active",
+                        "/product/**")
                     .permitAll()
                     .anyRequest()
                     .authenticated())

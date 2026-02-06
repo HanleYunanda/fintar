@@ -35,7 +35,10 @@ public class User extends BaseEntity {
   private Boolean isActive;
 
   @ManyToMany(fetch = FetchType.EAGER)
-  @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+  @JoinTable(
+      name = "user_roles",
+      joinColumns = @JoinColumn(name = "user_id"),
+      inverseJoinColumns = @JoinColumn(name = "role_id"))
   private Set<Role> roles = new HashSet<>();
 
   @OneToOne(mappedBy = "user")

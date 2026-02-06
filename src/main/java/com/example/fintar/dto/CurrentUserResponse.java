@@ -2,7 +2,6 @@ package com.example.fintar.dto;
 
 import java.util.Set;
 import java.util.UUID;
-
 import lombok.Builder;
 import lombok.Data;
 

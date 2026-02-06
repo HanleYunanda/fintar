@@ -21,6 +21,9 @@ public class PlafondRequest {
   private Integer maxTenor;
 
   @NotNull(message = "Next Plafond Limit is required")
-  @DecimalMin(value = "0.0", inclusive = false, message = "Next Plafond Limit must be greater than 0")
+  @DecimalMin(
+      value = "0.0",
+      inclusive = false,
+      message = "Next Plafond Limit must be greater than 0")
   private Double nextPlafondLimit;
 }

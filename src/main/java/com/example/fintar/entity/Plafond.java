@@ -3,8 +3,6 @@ package com.example.fintar.entity;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.List;
-import java.util.UUID;
-
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;

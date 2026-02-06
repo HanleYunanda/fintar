@@ -46,14 +46,12 @@ public class Loan extends BaseEntity {
 
   @ManyToMany
   @JoinTable(
-          name = "loan_documents",
-          joinColumns = @JoinColumn(name = "loan_id"),
-          inverseJoinColumns = @JoinColumn(name = "document_id")
-  )
+      name = "loan_documents",
+      joinColumns = @JoinColumn(name = "loan_id"),
+      inverseJoinColumns = @JoinColumn(name = "document_id"))
   private List<Document> documents;
 
   private Double latitude;
 
   private Double longitude;
-
 }

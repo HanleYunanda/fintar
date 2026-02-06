@@ -7,15 +7,11 @@ import com.example.fintar.entity.Document;
 import com.example.fintar.enums.DocType;
 import com.example.fintar.exception.ResourceNotFoundException;
 import com.example.fintar.repository.DocumentRepository;
-
-import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.UrlResource;
@@ -31,8 +27,8 @@ public class DocumentService {
   private final CustomerDetailService customerDetailService;
   private final DocumentRepository documentRepository;
 
-    @Value("${file.upload-dir}")
-    private String uploadDir;
+  @Value("${file.upload-dir}")
+  private String uploadDir;
 
   @Transactional
   public DocumentResponse uploadDocument(MultipartFile file, DocType docType) {
@@ -79,36 +75,38 @@ public class DocumentService {
         .build();
   }
 
-      @Transactional
-      public void inactivatePrevDocument(CustomerDetail customerDetail, DocType docType) {
-          Optional<Document> documentOpt = documentRepository.findByCustomerDetailAndDocTypeAndIsActiveTrue(customerDetail, docType);
-          if(documentOpt.isPresent()) {
-              Document document = documentOpt.get();
-              document.setIsActive(false);
-              documentRepository.save(document);
-          }
-      }
+  @Transactional
+  public void inactivatePrevDocument(CustomerDetail customerDetail, DocType docType) {
+    Optional<Document> documentOpt =
+        documentRepository.findByCustomerDetailAndDocTypeAndIsActiveTrue(customerDetail, docType);
+    if (documentOpt.isPresent()) {
+      Document document = documentOpt.get();
+      document.setIsActive(false);
+      documentRepository.save(document);
+    }
+  }
 
-      public List<Document> getDocumentEntitiesByCustomerDetail(CustomerDetail customerDetail) {
-        return documentRepository.findByCustomerDetailAndIsActiveTrue(customerDetail);
-      }
+  public List<Document> getDocumentEntitiesByCustomerDetail(CustomerDetail customerDetail) {
+    return documentRepository.findByCustomerDetailAndIsActiveTrue(customerDetail);
+  }
 
-      public Document getDocumentEntityById(UUID id) {
-        Optional<Document> document = documentRepository.findById(id);
-        if(document.isEmpty()) throw new ResourceNotFoundException("Document with id " + id + " not found");
-        return document.get();
-      }
+  public Document getDocumentEntityById(UUID id) {
+    Optional<Document> document = documentRepository.findById(id);
+    if (document.isEmpty())
+      throw new ResourceNotFoundException("Document with id " + id + " not found");
+    return document.get();
+  }
 
-        public UrlResource getDocumentFile(Document document) throws Exception {
-            Path baseDir = Paths.get(System.getProperty("user.dir"));
-            Path path = baseDir.resolve(document.getFileUri()).normalize();
-            UrlResource resource = new UrlResource(path.toUri());
+  public UrlResource getDocumentFile(Document document) throws Exception {
+    Path baseDir = Paths.get(System.getProperty("user.dir"));
+    Path path = baseDir.resolve(document.getFileUri()).normalize();
+    UrlResource resource = new UrlResource(path.toUri());
 
-            System.out.println(path);
-            System.out.println(resource);
-            if(!resource.exists()) {
-               throw new ResourceNotFoundException("File not found");
-            }
-            return resource;
-        }
+    System.out.println(path);
+    System.out.println(resource);
+    if (!resource.exists()) {
+      throw new ResourceNotFoundException("File not found");
+    }
+    return resource;
+  }
 }

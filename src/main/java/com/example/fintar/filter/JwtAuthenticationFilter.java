@@ -13,7 +13,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authorization.AuthorizationDeniedException;
@@ -34,17 +33,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private final CustomUserDetailsService userDetailsService;
   private final JwtBlacklistService jwtBlacklistService;
 
-  private static final Map<String, List<String>> WHITELIST = Map.of(
-      "POST", List.of(
-              "/auth/login",
-              "/auth/register"
-      ),
-      "GET", List.of(
-              "/plafond",
-              "/plafond/active",
-              "/product"
-      )
-  );
+  private static final Map<String, List<String>> WHITELIST =
+      Map.of(
+          "POST", List.of("/auth/login", "/auth/register"),
+          "GET", List.of("/plafond", "/plafond/active", "/product"));
 
   @Override
   protected void doFilterInternal(
@@ -79,8 +71,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       UserDetails userDetails = userDetailsService.loadUserByUsername(claims.getSubject());
 
       if (jwtService.isTokenValid(jwt, userDetails)) {
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-            userDetails, null, userDetails.getAuthorities());
+        UsernamePasswordAuthenticationToken authToken =
+            new UsernamePasswordAuthenticationToken(
+                userDetails, null, userDetails.getAuthorities());
 
         authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 

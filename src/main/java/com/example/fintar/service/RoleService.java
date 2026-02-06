@@ -16,8 +16,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -61,8 +59,8 @@ public class RoleService {
         .build();
   }
 
-    public RoleResponse getRoleById(UUID id) {
-      Role role = this.getRoleEntityById(id);
-      return roleMapper.toResponse(role);
-    }
+  public RoleResponse getRoleById(UUID id) {
+    Role role = this.getRoleEntityById(id);
+    return roleMapper.toResponse(role);
+  }
 }

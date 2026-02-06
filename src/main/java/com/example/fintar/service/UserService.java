@@ -13,7 +13,6 @@ import com.example.fintar.mapper.UserMapper;
 import com.example.fintar.repository.UserRepository;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.BadRequestException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -43,7 +42,8 @@ public class UserService {
     if (roles.isEmpty()) throw new ResourceNotFoundException("Role not found");
 
     // Cek email unique
-    if(userRepository.findByEmail(req.getEmail()).isPresent()) throw new BusinessValidationException("Email already exist");
+    if (userRepository.findByEmail(req.getEmail()).isPresent())
+      throw new BusinessValidationException("Email already exist");
 
     User user =
         User.builder()
@@ -86,21 +86,22 @@ public class UserService {
     userRepository.delete(user);
   }
 
-    public UserResponse updatePassword(UUID id, ChangePasswordRequest request) {
+  public UserResponse updatePassword(UUID id, ChangePasswordRequest request) {
 
-      User user = this.getUserEntity(id);
+    User user = this.getUserEntity(id);
 
-      Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-      UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
 
-      // Check if user belong to logged in user
-      if(!Objects.equals(userPrincipal.getUser().getId(), user.getId())) throw new BusinessValidationException("Cannot change other user password");
+    // Check if user belong to logged in user
+    if (!Objects.equals(userPrincipal.getUser().getId(), user.getId()))
+      throw new BusinessValidationException("Cannot change other user password");
 
-      // Check if old password valid
-      if(!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) throw new BusinessValidationException("Old Password Invalid");
-      user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+    // Check if old password valid
+    if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword()))
+      throw new BusinessValidationException("Old Password Invalid");
+    user.setPassword(passwordEncoder.encode(request.getNewPassword()));
 
-      return userMapper.toResponse(userRepository.save(user));
-
-    }
+    return userMapper.toResponse(userRepository.save(user));
+  }
 }

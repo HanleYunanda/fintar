@@ -2,12 +2,10 @@ package com.example.fintar.mapper;
 
 import com.example.fintar.dto.RoleRequest;
 import com.example.fintar.dto.RoleResponse;
-import com.example.fintar.entity.Permission;
 import com.example.fintar.entity.Role;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +16,14 @@ public class RoleMapper {
   private final PermissionMapper permissionMapper;
 
   public RoleResponse toResponse(Role role) {
-    return RoleResponse.builder().id(role.getId()).name(role.getName()).permissions(role.getPermissions() == null ? null : permissionMapper.toResponseSet(role.getPermissions())).build();
+    return RoleResponse.builder()
+        .id(role.getId())
+        .name(role.getName())
+        .permissions(
+            role.getPermissions() == null
+                ? null
+                : permissionMapper.toResponseSet(role.getPermissions()))
+        .build();
   }
 
   public List<RoleResponse> toResponseList(List<Role> roles) {

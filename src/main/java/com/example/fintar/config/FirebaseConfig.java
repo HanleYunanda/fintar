@@ -12,18 +12,20 @@ import org.springframework.core.io.ClassPathResource;
 @Configuration
 public class FirebaseConfig {
 
-    @PostConstruct
-    public void initialize() {
-        try {
-            if (FirebaseApp.getApps().isEmpty()) {
-                InputStream serviceAccount = new ClassPathResource("firebase-service-account.json").getInputStream();
-                FirebaseOptions options = FirebaseOptions.builder()
-                        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                        .build();
-                FirebaseApp.initializeApp(options);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+  @PostConstruct
+  public void initialize() {
+    try {
+      if (FirebaseApp.getApps().isEmpty()) {
+        InputStream serviceAccount =
+            new ClassPathResource("firebase-service-account.json").getInputStream();
+        FirebaseOptions options =
+            FirebaseOptions.builder()
+                .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                .build();
+        FirebaseApp.initializeApp(options);
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
     }
+  }
 }

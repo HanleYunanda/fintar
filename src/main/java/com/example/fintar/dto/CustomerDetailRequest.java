@@ -6,11 +6,8 @@ import com.example.fintar.enums.Religion;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.*;
-
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.UUID;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

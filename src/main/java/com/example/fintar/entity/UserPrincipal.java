@@ -19,9 +19,7 @@ public class UserPrincipal implements UserDetails {
   private final User user;
 
   public static UserPrincipal create(User user) {
-    return UserPrincipal.builder()
-        .user(user)
-        .build();
+    return UserPrincipal.builder().user(user).build();
   }
 
   @Override

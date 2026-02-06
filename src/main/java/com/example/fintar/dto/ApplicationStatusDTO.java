@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ApplicationStatusDTO {
-    private String status;
-    private Long count;
+  private String status;
+  private Long count;
 }

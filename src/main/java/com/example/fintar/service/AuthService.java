@@ -26,19 +26,21 @@ public class AuthService {
   private final CustomerDetailService customerDetailService;
 
   public User register(RegisterUserRequest req) {
-    User user = User.builder()
-        .email(req.getEmail())
-        .username(req.getUsername())
-        .password(passwordEncoder.encode(req.getPassword()))
-        .roles(roleService.getRolesEntityByName(Set.of("CUSTOMER")))
-        .isActive(true)
-        .build();
+    User user =
+        User.builder()
+            .email(req.getEmail())
+            .username(req.getUsername())
+            .password(passwordEncoder.encode(req.getPassword()))
+            .roles(roleService.getRolesEntityByName(Set.of("CUSTOMER")))
+            .isActive(true)
+            .build();
     return userRepository.save(user);
   }
 
   public UserPrincipal authenticate(LoginUserRequest req) {
-    Authentication auth = authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(req.getUsername(), req.getPassword()));
+    Authentication auth =
+        authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(req.getUsername(), req.getPassword()));
 
     UserPrincipal principal = (UserPrincipal) auth.getPrincipal();
 
@@ -58,31 +60,36 @@ public class AuthService {
       String name = decodedToken.getName();
 
       // Find user by email
-      return userRepository.findByEmail(email)
-          .map(user -> {
-            if (req.getFcmToken() != null && !req.getFcmToken().isEmpty()) {
-              user.setFcmToken(req.getFcmToken());
-              userRepository.save(user);
-            }
-            return UserPrincipal.create(user);
-          })
-          .orElseGet(() -> {
-            // Register new user
-            User newUser = User.builder()
-                .email(email)
-                .username(email) // Use email as username for Google login
-                .password(passwordEncoder.encode(java.util.UUID.randomUUID().toString())) // Random password
-                .roles(roleService.getRolesEntityByName(Set.of("CUSTOMER")))
-                .isActive(true)
-                .fcmToken(req.getFcmToken())
-                .build();
-            User registeredUser = userRepository.save(newUser);
-            CustomerDetailResponse customerDetail = customerDetailService.createCustomerDetail(
-                    CustomerDetailRequest.builder()
-                            .userId(registeredUser.getId())
-                            .build());
-            return UserPrincipal.create(registeredUser);
-          });
+      return userRepository
+          .findByEmail(email)
+          .map(
+              user -> {
+                if (req.getFcmToken() != null && !req.getFcmToken().isEmpty()) {
+                  user.setFcmToken(req.getFcmToken());
+                  userRepository.save(user);
+                }
+                return UserPrincipal.create(user);
+              })
+          .orElseGet(
+              () -> {
+                // Register new user
+                User newUser =
+                    User.builder()
+                        .email(email)
+                        .username(email) // Use email as username for Google login
+                        .password(
+                            passwordEncoder.encode(
+                                java.util.UUID.randomUUID().toString())) // Random password
+                        .roles(roleService.getRolesEntityByName(Set.of("CUSTOMER")))
+                        .isActive(true)
+                        .fcmToken(req.getFcmToken())
+                        .build();
+                User registeredUser = userRepository.save(newUser);
+                CustomerDetailResponse customerDetail =
+                    customerDetailService.createCustomerDetail(
+                        CustomerDetailRequest.builder().userId(registeredUser.getId()).build());
+                return UserPrincipal.create(registeredUser);
+              });
 
     } catch (Exception e) {
       throw new RuntimeException("Invalid Google ID Token", e);
