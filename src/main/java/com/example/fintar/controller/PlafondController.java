@@ -22,7 +22,7 @@ public class PlafondController {
   private final PlafondService plafondService;
 
   @GetMapping
-//  @PreAuthorize("hasAuthority('READ_PLAFOND')")
+  // @PreAuthorize("hasAuthority('READ_PLAFOND')")
   public ResponseEntity<ApiResponse<List<PlafondResponse>>> index() {
     List<PlafondResponse> plafonds = plafondService.getAllPlafond();
     return ResponseUtil.ok(plafonds, "Successfully get all plafonds");
@@ -37,7 +37,7 @@ public class PlafondController {
   }
 
   @GetMapping("/{id}")
-//  @PreAuthorize("hasAuthority('READ_PLAFOND')")
+  // @PreAuthorize("hasAuthority('READ_PLAFOND')")
   public ResponseEntity<ApiResponse<PlafondResponse>> show(@PathVariable UUID id) {
     PlafondResponse plafond = plafondService.getPlafond(id);
     return ResponseUtil.ok(plafond, "Successfully get plafond");
@@ -51,10 +51,23 @@ public class PlafondController {
     return ResponseUtil.ok(plafond, "Successfully update plafond");
   }
 
-//  @DeleteMapping("/{id}")
-//  @PreAuthorize("hasAuthority('DELETE_PLAFOND')")
-//  public ResponseEntity<ApiResponse<Plafond>> delete(@PathVariable UUID id) {
-//    plafondService.deletePlafond(id);
-//    return ResponseUtil.ok(null, "Successfully delete plafond");
-//  }
+  @PatchMapping("/orders")
+  public ResponseEntity<ApiResponse<List<PlafondResponse>>> updateOrders(
+      @RequestBody List<com.example.fintar.dto.PlafondOrderRequest> reqs) {
+    List<PlafondResponse> plafonds = plafondService.updatePlafondOrders(reqs);
+    return ResponseUtil.ok(plafonds, "Successfully update plafond orders");
+  }
+
+  @GetMapping("/active")
+  public ResponseEntity<ApiResponse<List<PlafondResponse>>> getActive() {
+    List<PlafondResponse> plafonds = plafondService.getActivePlafonds();
+    return ResponseUtil.ok(plafonds, "Successfully get active plafonds");
+  }
+
+  // @DeleteMapping("/{id}")
+  // @PreAuthorize("hasAuthority('DELETE_PLAFOND')")
+  // public ResponseEntity<ApiResponse<Plafond>> delete(@PathVariable UUID id) {
+  // plafondService.deletePlafond(id);
+  // return ResponseUtil.ok(null, "Successfully delete plafond");
+  // }
 }

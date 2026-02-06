@@ -3,6 +3,8 @@ package com.example.fintar.entity;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.List;
+import java.util.UUID;
+
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
@@ -26,6 +28,12 @@ public class Plafond extends BaseEntity implements Serializable {
 
   @Column(nullable = false)
   private Integer maxTenor;
+
+  @Column(name = "order_number")
+  private Integer orderNumber;
+
+  @Column(name = "next_plafond_limit")
+  private Double nextPlafondLimit;
 
   @OneToMany(mappedBy = "plafond")
   private List<Product> products;

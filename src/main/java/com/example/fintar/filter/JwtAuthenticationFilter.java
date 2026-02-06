@@ -12,6 +12,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authorization.AuthorizationDeniedException;
@@ -32,7 +34,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private final CustomUserDetailsService userDetailsService;
   private final JwtBlacklistService jwtBlacklistService;
 
-  private static final List<String> WHITELIST = List.of("/auth/login", "/auth/register", "/plafond", "/product");
+  private static final Map<String, List<String>> WHITELIST = Map.of(
+      "POST", List.of(
+              "/auth/login",
+              "/auth/register"
+      ),
+      "GET", List.of(
+              "/plafond",
+              "/plafond/active",
+              "/product"
+      )
+  );
 
   @Override
   protected void doFilterInternal(
@@ -50,11 +62,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     try {
       claims = jwtService.extractClaims(jwt);
-      //            username = jwtService.extractClaims(jwt).getSubject();
+      // username = jwtService.extractClaims(jwt).getSubject();
     } catch (JwtException e) {
       // JWT invalid → authentication failure
-      //            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT");
-      //            return;
+      // response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT");
+      // return;
       throw new InvalidJwtException("Invalid JWT");
     }
 
@@ -67,9 +79,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       UserDetails userDetails = userDetailsService.loadUserByUsername(claims.getSubject());
 
       if (jwtService.isTokenValid(jwt, userDetails)) {
-        UsernamePasswordAuthenticationToken authToken =
-            new UsernamePasswordAuthenticationToken(
-                userDetails, null, userDetails.getAuthorities());
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+            userDetails, null, userDetails.getAuthorities());
 
         authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
@@ -83,6 +94,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   @Override
   protected boolean shouldNotFilter(HttpServletRequest request) {
     String path = request.getServletPath();
-    return WHITELIST.stream().anyMatch(path::matches);
+    String method = request.getMethod();
+
+    List<String> paths = WHITELIST.get(method);
+    if (paths == null) {
+      return false;
+    }
+
+    return paths.stream().anyMatch(path::equals);
   }
 }

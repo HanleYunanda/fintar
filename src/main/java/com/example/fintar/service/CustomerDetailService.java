@@ -13,6 +13,8 @@ import com.example.fintar.exception.ResourceNotFoundException;
 import com.example.fintar.mapper.CustomerDetailMapper;
 import com.example.fintar.mapper.PlafondMapper;
 import com.example.fintar.repository.CustomerDetailRepository;
+import com.example.fintar.repository.LoanRepository;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -31,6 +33,7 @@ public class CustomerDetailService {
   // private final AuthService authService;
   private final PlafondService plafondService;
   private final PlafondMapper plafondMapper;
+  private final LoanRepository loanRepository;
 
   public List<CustomerDetailResponse> getAllCustomerDetail() {
     List<CustomerDetail> customerDetails = customerDetailRepository.findAll();
@@ -160,5 +163,30 @@ public class CustomerDetailService {
     return customerDetailRepository.save(customerDetail);
   }
 
+  public void updatePlafond(CustomerDetail customerDetail, Plafond newPlafond) {
+    customerDetail.setPlafond(newPlafond);
+    customerDetailRepository.save(customerDetail);
+  }
+
+  public void processPlafondUpgrade(UUID userId) {
+    User user = userService.getUserEntity(userId);
+    CustomerDetail customerDetail = user.getCustomerDetail();
+
+    Plafond currentPlafond = customerDetail.getPlafond();
+    Integer maxOrder = plafondService.getMaxOrderNumber();
+
+    if (currentPlafond.getOrderNumber() != null && currentPlafond.getOrderNumber() < maxOrder) {
+      Long totalDisbursed = loanRepository.sumDisbursedLoansByUser(userId);
+
+      if (currentPlafond.getNextPlafondLimit() != null && totalDisbursed > currentPlafond.getNextPlafondLimit()) {
+        Integer nextOrder = currentPlafond.getOrderNumber() + 1;
+        Optional<Plafond> nextPlafondOpt = plafondService.getPlafondByOrderNumber(nextOrder);
+
+        if (nextPlafondOpt.isPresent()) {
+          this.updatePlafond(customerDetail, nextPlafondOpt.get());
+        }
+      }
+    }
+  }
 
 }

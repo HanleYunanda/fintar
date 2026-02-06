@@ -14,6 +14,8 @@ public class PlafondMapper {
         .name(plafond.getName())
         .maxAmount(plafond.getMaxAmount())
         .maxTenor(plafond.getMaxTenor())
+        .orderNumber(plafond.getOrderNumber())
+        .nextPlafondLimit(plafond.getNextPlafondLimit())
         .build();
   }
 
@@ -26,6 +28,7 @@ public class PlafondMapper {
         .name(request.getName())
         .maxAmount(request.getMaxAmount())
         .maxTenor(request.getMaxTenor())
+        .nextPlafondLimit(request.getNextPlafondLimit())
         .build();
   }
 }

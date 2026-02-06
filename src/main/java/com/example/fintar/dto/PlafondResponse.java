@@ -11,4 +11,6 @@ public class PlafondResponse {
   private String name;
   private Double maxAmount;
   private Integer maxTenor;
+  private Integer orderNumber;
+  private Double nextPlafondLimit;
 }

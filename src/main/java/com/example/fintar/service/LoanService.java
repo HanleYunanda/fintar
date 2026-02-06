@@ -213,6 +213,9 @@ public class LoanService {
     CustomerDetail customerDetail = userService.getUserEntity(loan.getCreatedBy()).getCustomerDetail();
     customerDetailService.substractRemainPlafond(customerDetail, loan.getPrincipalDebt());
 
+    // Upgrade Plafond Logic
+    customerDetailService.processPlafondUpgrade(loan.getCreatedBy());
+
     return loanStatusHistoryMapper.toResponse(this.changeStatusApproval(loan, req));
   }
 

@@ -38,7 +38,7 @@ public class SecurityConfig {
                 authorizationManagerRequestMatcherRegistry
                     .requestMatchers(WHITE_LIST)
                     .permitAll()
-                    .requestMatchers(HttpMethod.GET, "/document/**", "/plafond", "/product/**")
+                    .requestMatchers(HttpMethod.GET, "/document/**", "/plafond", "/plafond/active", "/product/**")
                     .permitAll()
                     .anyRequest()
                     .authenticated())

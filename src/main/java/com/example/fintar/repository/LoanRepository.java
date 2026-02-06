@@ -84,4 +84,7 @@ public interface LoanRepository extends JpaRepository<Loan, UUID> {
     List<BestSellingProductDTO> findBestSellingProducts(@Param("limit") Integer limit);
 
     List<Loan> findAllByCreatedBy(UUID userId);
+
+    @Query("SELECT COALESCE(SUM(l.principalDebt), 0) FROM Loan l WHERE l.createdBy = :userId AND l.status = 'DISBURSED'")
+    Long sumDisbursedLoansByUser(@Param("userId") UUID userId);
 }

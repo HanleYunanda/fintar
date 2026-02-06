@@ -19,4 +19,8 @@ public class PlafondRequest {
   @NotNull(message = "Max tenor is required")
   @Min(value = 1, message = "Max tenor be at least 1 month")
   private Integer maxTenor;
+
+  @NotNull(message = "Next Plafond Limit is required")
+  @DecimalMin(value = "0.0", inclusive = false, message = "Next Plafond Limit must be greater than 0")
+  private Double nextPlafondLimit;
 }
