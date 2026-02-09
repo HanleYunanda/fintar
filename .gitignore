@@ -39,3 +39,7 @@ application.yml
 
 # Firebase
 src/main/resources/firebase-service-account.json
+
+# Ignored directories
+logs/
+files/
