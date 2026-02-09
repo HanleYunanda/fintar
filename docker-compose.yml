@@ -33,11 +33,11 @@ services:
       - fintar-network
 
   redis:
-    image: redis:7
+    image: redis:7.2
     container_name: redis
     environment:
       REDIS_PASSWORD: ${SPRING_DATA_REDIS_PASSWORD}
-    command: ["redis-server", "--requirepass", "${SPRING_DATA_REDIS_PASSWORD}"]
+    command: [ "redis-server", "--requirepass", "${SPRING_DATA_REDIS_PASSWORD}" ]
     ports:
       - "6379:6379"
     volumes:
@@ -45,9 +45,18 @@ services:
     networks:
       - fintar-network
 
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: redisinsight
+    ports:
+      - "5540:5540"
+    networks:
+      - fintar-network
+
 volumes:
   mssql-data:
   redis-data:
+
 
 networks:
   fintar-network:
