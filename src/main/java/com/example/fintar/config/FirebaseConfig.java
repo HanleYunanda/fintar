@@ -12,20 +12,30 @@ import org.springframework.core.io.ClassPathResource;
 @Configuration
 public class FirebaseConfig {
 
+  @org.springframework.beans.factory.annotation.Value("${app.firebase.config-file:classpath:firebase-service-account.json}")
+  private String firebaseConfigPath;
+
   @PostConstruct
   public void initialize() {
     try {
       if (FirebaseApp.getApps().isEmpty()) {
-        InputStream serviceAccount =
-            new ClassPathResource("firebase-service-account.json").getInputStream();
-        FirebaseOptions options =
-            FirebaseOptions.builder()
-                .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                .build();
+        InputStream serviceAccount = getServiceAccountStream();
+        FirebaseOptions options = FirebaseOptions.builder()
+            .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+            .build();
         FirebaseApp.initializeApp(options);
       }
     } catch (IOException e) {
       e.printStackTrace();
+    }
+  }
+
+  private InputStream getServiceAccountStream() throws IOException {
+    if (firebaseConfigPath.startsWith("classpath:")) {
+      String path = firebaseConfigPath.substring("classpath:".length());
+      return new ClassPathResource(path).getInputStream();
+    } else {
+      return new java.io.FileInputStream(firebaseConfigPath);
     }
   }
 }
