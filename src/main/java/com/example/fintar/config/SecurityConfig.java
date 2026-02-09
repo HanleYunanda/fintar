@@ -22,11 +22,13 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
-  @Autowired private AuthenticationProvider authenticationProvider;
-  @Autowired private JwtAuthenticationFilter jwtAuthenticationFilter;
+  @Autowired
+  private AuthenticationProvider authenticationProvider;
+  @Autowired
+  private JwtAuthenticationFilter jwtAuthenticationFilter;
 
   private static final String[] WHITE_LIST = {
-    "/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html"
+      "/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html"
   };
 
   @Bean
@@ -34,23 +36,21 @@ public class SecurityConfig {
     http.csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.disable())
         .cors(Customizer.withDefaults())
         .authorizeHttpRequests(
-            authorizationManagerRequestMatcherRegistry ->
-                authorizationManagerRequestMatcherRegistry
-                    .requestMatchers(WHITE_LIST)
-                    .permitAll()
-                    .requestMatchers(
-                        HttpMethod.GET,
-                        "/document/**",
-                        "/plafond",
-                        "/plafond/active",
-                        "/product/**")
-                    .permitAll()
-                    .anyRequest()
-                    .authenticated())
+            authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry
+                .requestMatchers(WHITE_LIST)
+                .permitAll()
+                .requestMatchers(
+                    HttpMethod.GET,
+                    "/document/**",
+                    "/plafond",
+                    "/plafond/active",
+                    "/product/**")
+                .permitAll()
+                .anyRequest()
+                .authenticated())
         .sessionManagement(
-            httpSecuritySessionManagementConfigurer ->
-                httpSecuritySessionManagementConfigurer.sessionCreationPolicy(
-                    SessionCreationPolicy.STATELESS))
+            httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer.sessionCreationPolicy(
+                SessionCreationPolicy.STATELESS))
         .authenticationProvider(authenticationProvider)
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
     return http.build();
@@ -60,7 +60,8 @@ public class SecurityConfig {
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
 
-    configuration.setAllowedOrigins(List.of("http://localhost:4200"));
+    configuration.setAllowedOrigins(
+        List.of("http://localhost:4200", "https://fintar-fe.vercel.app"));
     configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
     configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
 
