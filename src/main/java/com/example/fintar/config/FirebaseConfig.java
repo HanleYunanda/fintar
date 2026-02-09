@@ -19,12 +19,15 @@ public class FirebaseConfig {
   public void initialize() {
     try {
       if (FirebaseApp.getApps().isEmpty()) {
-        InputStream serviceAccount = getServiceAccountStream();
-        FirebaseOptions options = FirebaseOptions.builder()
-            .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-            .build();
-        FirebaseApp.initializeApp(options);
+        try (InputStream serviceAccount = getServiceAccountStream()) {
+          FirebaseOptions options = FirebaseOptions.builder()
+              .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+              .build();
+          FirebaseApp.initializeApp(options);
+        }
       }
+    } catch (java.io.FileNotFoundException e) {
+      System.err.println("WARNING: Firebase config file not found: " + firebaseConfigPath);
     } catch (IOException e) {
       e.printStackTrace();
     }
